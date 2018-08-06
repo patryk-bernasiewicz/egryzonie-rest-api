@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "start-dev": "nodemon index.js",
-    "test": "mocha --reporter=dot --recursive",
+    "test": "mocha --reporter=spec --recursive --watch",
     "coverage": "nyc --reporter=html --reporter=text mocha --reporter=dot --recursive"
   },
   "dependencies": {
