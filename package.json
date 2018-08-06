@@ -1,0 +1,36 @@
+{
+  "name": "egryzonie-rest",
+  "version": "0.0.1",
+  "description": "eGryzonie RESTful API for backend",
+  "main": "index.js",
+  "repository": "https://patryk_bernasiewicz@bitbucket.org/patryk_bernasiewicz/egryzonie-rest.git",
+  "author": "Patryk Bernasiewicz",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start-dev": "nodemon index.js",
+    "test": "mocha --reporter=dot --recursive",
+    "coverage": "nyc --reporter=html --reporter=text mocha --reporter=dot --recursive"
+  },
+  "dependencies": {
+    "compression": "^1.7.3",
+    "config": "^2.0.1",
+    "express": "^4.16.3",
+    "express-async-errors": "^3.0.0",
+    "helmet": "^3.13.0",
+    "joi": "^13.5.2",
+    "joi-objectid": "^2.0.0",
+    "mongoose": "^5.2.7",
+    "slugify": "^1.3.1",
+    "winston": "^3.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.3.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.3",
+    "nyc": "^12.0.2",
+    "supertest": "^3.1.0"
+  }
+}
