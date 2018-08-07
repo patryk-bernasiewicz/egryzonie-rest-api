@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 
 const { GeoSchema } = require('./geoschema');
 
+const slugRegex = /^[a-z0-9-]{1,}$/;
+const nameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/;
+
 const VetSchema = new mongoose.Schema({
   position: {
     type: GeoSchema,
@@ -19,7 +22,7 @@ const VetSchema = new mongoose.Schema({
   slug: {
     type: String,
     validate: {
-      validator: value => value.match(/^[a-z0-9-]{1,}$/),
+      validator: value => slugRegex.test(value),
       message: 'invalid slug'
     }
   },
@@ -27,7 +30,7 @@ const VetSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: value => value.match(/^[a-zA-Z0-9ąćęłóśżźĄĆĘŁÓŚŻŹ .,-:_]{1,}$/),
+      validator: value => nameRegex.test(value),
       message: 'invalid name'
     }
   },
