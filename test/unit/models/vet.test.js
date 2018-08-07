@@ -48,6 +48,12 @@ describe('Vet fields validation', () => {
     expect(validate.errors).to.haveOwnProperty('name');
     expect(validate.errors.name.message).to.match(/invalid name/);
   });
+
+  it('should be ok if payload is valid', () => {
+    const validate = exec(payload);
+
+    expect(validate).to.be.undefined;
+  });
 });
 
 // Clear mongoose models so that mocha's --watch works

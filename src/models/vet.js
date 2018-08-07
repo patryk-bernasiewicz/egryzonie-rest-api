@@ -19,7 +19,7 @@ const VetSchema = new mongoose.Schema({
   slug: {
     type: String,
     validate: {
-      validator: value => value.match(/^[a-z0-9-]$/),
+      validator: value => value.match(/^[a-z0-9-]{1,}$/),
       message: 'invalid slug'
     }
   },
@@ -27,7 +27,7 @@ const VetSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: value => value.match(/^[a-zA-Z0-9 .,-:_]$/),
+      validator: value => value.match(/^[a-zA-Z0-9ąćęłóśżźĄĆĘŁÓŚŻŹ .,-:_]{1,}$/),
       message: 'invalid name'
     }
   },
