@@ -1,27 +1,30 @@
 const { describe, it, beforeEach } = require('mocha');
 const { expect } = require('chai');
 const { Vet } = require('../../../src/models/vet');
+const { User } = require('../../../src/models/user');
 const mongoose = require('mongoose');
 
 let payload;
 
 describe('Vet Model', () => {
-  describe('Vet fields validation', () => {
-    beforeEach(() => {
-      payload = {
-        _id: new mongoose.Types.ObjectId().toHexString(),
-        position: { type: 'Point', coordinates: [ -69.12345, -96.54321 ] },
-        slug: 'centrum-zdrowia-malych-zwierzat',
-        name: 'Centrum Zdrowia Małych Zwierząt',
-        address: 'Wronki, ul. Poznańska 39',
-        rodents: true,
-        exoticAnimals: true,
-        websiteUrl: 'http://centrumwet.pl',
-        phone: '123 456 789',
-        accepted: true
-      };
-    });
+  beforeEach(() => {
+    payload = {
+      _id: new mongoose.Types.ObjectId().toHexString(),
+      position: { type: 'Point', coordinates: [ -69.12345, -96.54321 ] },
+      slug: 'centrum-zdrowia-malych-zwierzat',
+      name: 'Centrum Zdrowia Małych Zwierząt',
+      address: 'Wronki, ul. Poznańska 39',
+      rodents: true,
+      exoticAnimals: true,
+      websiteUrl: 'http://centrumwet.pl',
+      phone: '123 456 789',
+      accepted: true,
+      acceptedBy: { _id: mongoose.Types.ObjectId() },
+      acceptedDate: Date.now()
+    };
+  });
 
+  describe('Vet fields validation', () => {
     const exec = (payload) => {
       return new Vet(payload).validateSync();
     };
@@ -57,6 +60,16 @@ describe('Vet Model', () => {
       const validate = exec(payload);
 
       expect(validate).to.be.undefined;
+    });
+  });
+
+  describe('Relationships', () => {
+    it('should have an acceptedBy field that references a User', () => {
+      payload.acceptedBy = new User({ _id: mongoose.Types.ObjectId(), nickname: 'EnslavedEagle' });
+      const vet = new Vet(payload);
+
+      expect(vet.acceptedBy).to.be.an('object');
+      expect(mongoose.Types.ObjectId.isValid(vet.acceptedBy.id)).to.be.true;
     });
   });
   

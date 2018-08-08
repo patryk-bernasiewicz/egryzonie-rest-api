@@ -42,7 +42,15 @@ const VetSchema = new mongoose.Schema({
   exoticAnimals: Boolean,
   websiteUrl: String,
   phone: String,
-  accepted: Boolean
+  accepted: Boolean,
+  acceptedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  acceptedDate: {
+    type: Date,
+    default: Date.now()
+  }
 });
 
 VetSchema.index({ position: '2dsphere' });

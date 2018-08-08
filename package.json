@@ -8,9 +8,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=production node index.js",
-    "start-dev": "cross-env NODE_ENV=development nodemon index.js",
-    "test": "cross-env NODE_ENV=test mocha --reporter=spec --recursive --watch",
+    "start": "cross-env NODE_ENV=production node start.js",
+    "start-dev": "cross-env NODE_ENV=development nodemon start.js",
+    "test": "cross-env NODE_ENV=test mocha --reporter=spec --recursive --exit --watch",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --reporter=dot --recursive"
   },
   "dependencies": {
@@ -33,6 +33,7 @@
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
     "eslint": "^5.3.0",
+    "jest": "^23.4.2",
     "mocha": "^5.2.0",
     "mongoose-mock": "^0.4.0",
     "nodemon": "^1.18.3",

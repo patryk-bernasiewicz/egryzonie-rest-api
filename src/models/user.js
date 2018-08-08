@@ -64,7 +64,5 @@ userSchema._middleware = {
 
 userSchema.pre('save', userSchema._middleware.hashPassword);
 
-const User = mongoose.model('User', userSchema);
-
 exports.userSchema = userSchema;
-exports.User = User;
+exports.User = mongoose.model('User', userSchema);

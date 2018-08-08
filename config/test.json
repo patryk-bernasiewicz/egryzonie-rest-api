@@ -1,4 +1,4 @@
 {
   "jwtPrivateKey": "test",
-  "db": "mongodb://localhost/egryzonie-test-db"
+  "db": "mongodb://localhost:27017/egryzonie-test-db"
 }
