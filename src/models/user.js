@@ -1,7 +1,7 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
-const Joi = require('joi');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const nicknameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/;
 const emailRegex =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -49,16 +49,22 @@ userSchema.methods.generateAuthToken = function() {
   return token;
 };
 
-function validateUser(user) {
-  const schema = {
-    nickname: Joi.string().required().minlength(5).maxlength(50),
-    email: Joi.email().required().minlength(5).maxlength(255),
-    password: Joi.string().minlength(5).maxlength(1024)
-  };
+userSchema._middleware = {
+  hashPassword: async function(next) {
+    const salt = await bcrypt.genSalt(6);
+    const hash = await bcrypt.hash(this.password, salt);
 
-  return Joi.validate(user, schema);
-}
+    this.password = hash;
+
+    next();
+
+    return Promise.resolve(true);
+  }
+};
+
+userSchema.pre('save', userSchema._middleware.hashPassword);
+
+const User = mongoose.model('User', userSchema);
 
 exports.userSchema = userSchema;
-exports.User = mongoose.model('User', userSchema);
-exports.validateUser = validateUser;
+exports.User = User;

@@ -1,19 +1,32 @@
 const { describe, it, beforeEach } = require('mocha');
-const { expect } = require('chai');
-const { User } = require('../../../src/models/user');
+const { User, userSchema } = require('../../../src/models/user');
+const chai = require('chai');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const _ = require('lodash');
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
+chai.use(sinonChai);
+
+require('sinon-mongoose');
+
+const expect = chai.expect;
 
 let payload;
 
 describe('User Model', () => {
+  beforeEach(() => {
+    payload = {
+      _id: mongoose.Types.ObjectId().toHexString(),
+      nickname: 'EnslavedEagle92',
+      email: 'kontakt@patrykb.pl',
+      password: '1234abcDEF'
+    };
+  });
+
   describe('User fields validation', () => {
-    beforeEach(() => {
-      payload = {
-        nickname: 'EnslavedEagle92',
-        email: 'kontakt@patrykb.pl',
-        password: '1234abcDEF'
-      };
-    });
 
     const exec = (payload) => {
       return new User(payload).validateSync();
@@ -63,6 +76,34 @@ describe('User Model', () => {
       const validate = exec(payload);
 
       expect(validate).to.be.undefined;
+    });
+  });
+
+  describe('User.methods.generateAuthToken()', () => {
+    it('generates valid JWT Token', () => {
+      const token = new User(payload).generateAuthToken();
+      
+      const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
+
+      expect(decoded).to.haveOwnProperty('_id');
+      expect(decoded).to.haveOwnProperty('role');
+      expect(decoded._id).to.equal(payload._id);
+      expect(decoded.role).to.equal('user');
+    });
+  });
+
+  describe('User pre-save hook: hash password', () => {
+    it('should hash the password before saving', async () => {
+      let ctx = _.clone(payload);
+      const spy = sinon.spy();
+
+      const bound = _.bind(userSchema._middleware.hashPassword, ctx);
+      await bound(spy);
+
+      const decoded = await bcrypt.compare(payload.password, ctx.password);
+      
+      sinon.assert.calledOnce(spy);
+      expect(decoded).to.be.true;
     });
   });
 });
