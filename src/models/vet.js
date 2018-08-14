@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugHero = require('mongoose-slug-hero');
 
 const { GeoSchema } = require('./geoschema');
 
@@ -54,6 +55,8 @@ const VetSchema = new mongoose.Schema({
 });
 
 VetSchema.index({ position: '2dsphere' });
+
+VetSchema.plugin(slugHero, { doc: 'vet', field: 'name' });
 
 const Vet = mongoose.model('Vet', VetSchema);
 

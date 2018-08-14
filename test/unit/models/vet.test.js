@@ -11,7 +11,6 @@ describe('Vet Model', () => {
     payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
       position: { type: 'Point', coordinates: [ -69.12345, -96.54321 ] },
-      slug: 'centrum-zdrowia-malych-zwierzat',
       name: 'Centrum Zdrowia Małych Zwierząt',
       address: 'Wronki, ul. Poznańska 39',
       rodents: true,
@@ -38,14 +37,14 @@ describe('Vet Model', () => {
       expect(validate.errors.position.message).to.match(/invalid position/);
     });
 
-    it('should reject invalid slug', () => {
-      payload.slug = 'centrum Zdrowia malych';
+    // it('should reject invalid slug', () => {
+    //   payload.slug = 'centrum Zdrowia malych';
 
-      const validate = exec(payload);
-      expect(validate).to.not.be.undefined;
-      expect(validate.errors).to.haveOwnProperty('slug');
-      expect(validate.errors.slug.message).to.match(/invalid slug/);
-    });
+    //   const validate = exec(payload);
+    //   expect(validate).to.not.be.undefined;
+    //   expect(validate.errors).to.haveOwnProperty('slug');
+    //   expect(validate.errors.slug.message).to.match(/invalid slug/);
+    // });
 
     it('should reject invalid name', () => {
       payload.name = '#!@%!@%!@';

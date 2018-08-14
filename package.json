@@ -11,6 +11,7 @@
     "start": "cross-env NODE_ENV=production node start.js",
     "start-dev": "cross-env NODE_ENV=development nodemon start.js",
     "test": "cross-env NODE_ENV=test mocha --recursive --watch",
+    "test-debug": "cross-env NODE_ENV=test DEBUG_MODE=true yarn test",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --reporter=dot --recursive"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
     "joi-objectid": "^2.0.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
+    "mocha-logger": "^1.0.6",
     "mongoose": "^5.2.7",
     "mongoose-slug-hero": "^1.1.1",
     "querymen": "^2.1.3",
