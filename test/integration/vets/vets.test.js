@@ -4,9 +4,11 @@ const faker = require('faker');
 const { describe, it, beforeEach, afterEach } = require('mocha');
 const { expect } = require('chai');
 const mlog = require('mocha-logger');
+const config = require('config');
 
 const { Vet } = require('../../../src/models/vet');
 
+let db;
 let server;
 let path;
 
@@ -20,6 +22,17 @@ const vets = [
   { name: 'Stu', address: '890 St.' },
   { name: 'Zzz Caffee', address: 'Zzz St.' }
 ];
+
+const startDb = async function() {
+  const dbConfig = config.get('db');
+  db = await mongoose
+    .connect(dbConfig, { useNewUrlParser: true })
+    .catch(err => console.error(err.message));
+};
+
+const closeDb = async function() {
+  await mongoose.connection.close();
+};
 
 const startServer = async function() {
   server = await require('../../../index').listen();
@@ -47,6 +60,8 @@ describe('Vet integration tests', async function() {
       { name: 'Abc', address: '456 St.' }
     ];
 
+    before(startDb);
+
     it('should generate new Vet without problem', async () => {
       const vet = await new Vet(payload[0]).save();
 
@@ -66,9 +81,10 @@ describe('Vet integration tests', async function() {
       expect(vets[1].slug).to.match(/^abc-2$/);
       expect(vets[2].slug).to.match(/^abc-3$/);
     });
-
     
     afterEach(clearVets);
+
+    after(closeDb);
   });
 
 
