@@ -10,8 +10,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node start.js",
     "start-dev": "cross-env NODE_ENV=development nodemon start.js",
-    "test": "cross-env NODE_ENV=test mocha --recursive --watch",
-    "test-debug": "cross-env NODE_ENV=test DEBUG_MODE=true yarn test",
+    "test": "node ./test/momentizer.js && cross-env NODE_ENV=test mocha --recursive --watch",
+    "test-debug": "node ./test/momentizer.js && cross-env NODE_ENV=test DEBUG_MODE=true yarn test",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --reporter=dot --recursive"
   },
   "dependencies": {
@@ -22,14 +22,17 @@
     "express": "^4.16.3",
     "express-async-errors": "^3.0.0",
     "helmet": "^3.13.0",
-    "joi": "^13.5.2",
+    "joi": "^13.6.0",
     "joi-objectid": "^2.0.0",
+    "joi-password-complexity": "^2.0.1",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
     "mocha-logger": "^1.0.6",
-    "mongoose": "^5.2.7",
+    "moment": "^2.22.2",
+    "mongoose": "^5.2.10",
     "mongoose-slug-hero": "^1.1.1",
     "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "querymen": "^2.1.3",
     "slugify": "^1.3.1",
@@ -38,19 +41,19 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
-    "eslint": "^5.3.0",
+    "eslint": "^5.4.0",
     "faker": "^4.1.0",
-    "jest": "^23.4.2",
+    "jest": "^23.5.0",
     "mocha": "^5.2.0",
     "mongoose-mock": "^0.4.0",
     "nodemon": "^1.18.3",
-    "nyc": "^12.0.2",
-    "proxyquire": "^2.0.1",
+    "nyc": "^13.0.1",
+    "proxyquire": "^2.1.0",
     "sinon": "^6.1.5",
     "sinon-as-promised": "^4.0.3",
     "sinon-chai": "^3.2.0",
     "sinon-mongoose": "^2.2.1",
     "supertest": "^3.1.0",
-    "testgoose": "^2.1.0"
+    "testgoose": "^2.2.0"
   }
 }

@@ -3,6 +3,7 @@ const winston = require('winston');
 
 const app = express();
 
+require('./startup/passport')(app);
 require('./startup/logging')();
 require('./startup/routes')(app);
 require('./startup/db')();

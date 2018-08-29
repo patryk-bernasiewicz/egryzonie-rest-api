@@ -12,6 +12,8 @@ let db;
 let server;
 let path;
 
+const error = err => console.error(err.message);
+
 const vets = [
   { name: 'Abc', address: '123 St.' },
   { name: 'Def', address: '234 St.' },
@@ -27,40 +29,39 @@ const startDb = async function() {
   const dbConfig = config.get('db');
   db = await mongoose
     .connect(dbConfig, { useNewUrlParser: true })
-    .catch(err => console.error(err.message));
-};
-
-const closeDb = async function() {
-  await mongoose.connection.close();
+    .catch(error);
 };
 
 const startServer = async function() {
-  server = await require('../../../index').listen();
+  server = require('../../../index').listen();
+  mlog.log('Server listening...');
 };
 
 const closeServer = async function() {
   await server.close();
+  mlog.log('Server stopped');
 };
 
 const clearVets = async function() {
-  await Vet.remove({});
-  await mongoose.connection.db.collection('_slug_ctrs').remove({});
+  await Vet.deleteMany({}).catch(error);
+  await mongoose.connection.db.collection('_slug_ctrs').remove({}).catch(error);
+  mlog.log('Vets collection cleared!');
 };
 
 
 describe('Vet integration tests', async function() {
   this.timeout(15000);
 
+  before(startDb);
+  beforeEach(clearVets);
 
-
+  // General integration tests with models
   describe('Vet model behavior', function() {
     const payload = [
       { name: 'Abc', address: '123 St.' },
       { name: 'Abc', address: '321 St.' },
       { name: 'Abc', address: '456 St.' }
     ];
-
-    before(startDb);
 
     it('should generate new Vet without problem', async () => {
       const vet = await new Vet(payload[0]).save();
@@ -81,22 +82,16 @@ describe('Vet integration tests', async function() {
       expect(vets[1].slug).to.match(/^abc-2$/);
       expect(vets[2].slug).to.match(/^abc-3$/);
     });
-    
-    afterEach(clearVets);
-
-    after(closeDb);
   });
 
 
-
+  // HTTP integration tests
   describe('Vet routes', function () {
-    this.timeout(10000);
+    this.timeout(15000);
 
-    beforeEach(startServer);
+    before(startServer);
 
     describe('GET /vets', function () {
-      this.timeout(10000);
-
       path = '/vets';
 
       const exec = () => {
@@ -177,11 +172,9 @@ describe('Vet integration tests', async function() {
         expect(res.body[0].name).to.equal(specificVet.name);
       });
 
-      afterEach(clearVets);
     });
 
-
-    afterEach(closeServer);
+    after(closeServer);
   });
 });
 
