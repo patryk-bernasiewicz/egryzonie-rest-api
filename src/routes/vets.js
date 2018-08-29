@@ -12,6 +12,8 @@ const querySchema = new querymen.Schema({
   }
 });
 
+// GET /vets
+
 router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor: { skip, limit }, sort } }, res) => {
   const vets = await Vet
     .find(search)
