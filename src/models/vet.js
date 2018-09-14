@@ -82,3 +82,4 @@ function validateVet(vet) {
 exports.Vet = Vet;
 exports.VetSchema = VetSchema;
 exports.validateVet = validateVet;
+exports.vetUpdatableFields = ['position', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone'];

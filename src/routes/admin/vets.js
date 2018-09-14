@@ -4,7 +4,7 @@ const passport = require('passport');
 const url = require('url');
 const _ = require('lodash');
 const querymen = require('querymen');
-const { Vet, validateVet } = require('../../models/vet');
+const { Vet, validateVet, vetUpdatableFields } = require('../../models/vet');
 const adminGuard = require('../../middleware/admin-guard');
 const Joi = require('joi');
 
@@ -55,6 +55,26 @@ router.get('/:slug', async (req, res, next) => {
 // POST /admin/vets
 
 router.post('/', async (req, res, next) => {
+  const { error, result } = validateVet(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.message });
+  }
+
+  const payload = _.pick(req.body, vetUpdatableFields);
+  payload.position = {
+    type: 'Point',
+    coordinates: payload.position
+  };
+  const vet = await new Vet(payload).save().catch(next);
+
+  return res.status(201).json({ vet, location: '/admin/vets/' + vet.slug });
+});
+
+
+// PUT /admin/vets
+
+router.put('/', async (req, res, next) => {
   const { error, result } = validateVet(req.body);
 
   if (error) {
