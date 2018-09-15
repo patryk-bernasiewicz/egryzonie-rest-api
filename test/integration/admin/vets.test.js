@@ -470,6 +470,50 @@ describe('ADMIN Vets integration tests', function() {
       
     });
 
+
+    // DELETE /vets/:id
+    describe('DELETE /vets/:id', async () => {
+      // retrieve one known ID from databse
+      let knownId;
+      beforeEach(async () => {
+        const vet = await new Vet({
+          name: 'Random Vet Over Here',
+          address: 'Random Addres'
+        }).save();
+        knownId = vet._id;
+      });
+
+      const exec = () => {
+        return request(server)
+          .delete('/admin/vets/' + knownId)
+          .set('Authorization', `Bearer ${token}`);
+      };
+
+
+      it('should return 401 if user is not an admin', async () => {
+        const regularUser = await new User({
+          nickname: 'RegularUser',
+          email: 'regular@user.net',
+          password: 'RegularUserPassword'
+        }).save();
+        token = regularUser.generateAuthToken();
+
+        const res = await exec();
+
+        expect(res.status).to.equal(401);
+        expect(res.body.message).to.match(/unauthorized/);
+      });
+    });
+
+    it('should delete vet', async () => {
+      const res = await exec();
+
+      expect(res.status).to.equal(200);
+      
+      const vet = await Vet.findById(knownId);
+      expect(vet).to.be.null;
+    });
+
     afterEach(clearVets);
     after(closeServer);
   });
