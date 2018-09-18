@@ -101,7 +101,7 @@ describe('Vet integration tests', async function() {
       };
 
       beforeEach(async () => {
-        await Vet.collection.insertMany(vets);
+        await Vet.collection.insertMany(vets).catch(err => console.error(err));
       });
 
       it('should return valid amount of Vets', async () => {

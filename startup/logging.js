@@ -7,7 +7,8 @@ module.exports = function() {
     new winston.transports.File({ filename: 'uncaught-exceptions.log' })
   );
 
-  process.on('unhandledRejection', ((ex) => {
-    throw new Error(ex);
-  }).bind(null, { exit: true }));
+  process.on('unhandledRejection', error => {
+    // Will print "unhandledRejection err is not defined"
+    console.log('unhandledRejection', error);
+  });
 };

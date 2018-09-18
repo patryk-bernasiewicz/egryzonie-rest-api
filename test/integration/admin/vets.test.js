@@ -4,8 +4,16 @@ const faker = require('faker');
 const { describe, it, beforeEach, afterEach } = require('mocha');
 const { expect } = require('chai');
 const config = require('config');
-const momentizer = require('../../momentizer');
 const log = require('../../test-log');
+
+const TestHelper = require('../../helpers/test-helper');
+const VetHelper = require('../../helpers/vet-helper');
+
+const testHelper = new TestHelper;
+const vetHelper = new VetHelper;
+
+mongoose.models = {};
+mongoose.modelSchemas = {};
 
 const { Vet } = require('../../../src/models/vet');
 const { User } = require('../../../src/models/user');
@@ -21,42 +29,9 @@ const vets = [
   { name: 'Zzz Caffee', address: 'Zzz St.' }
 ];
 
-let db;
 let server;
-let path;
-
-const startDb = async function() {
-  const dbConfig = config.get('db');
-  db = await mongoose
-    .connect(dbConfig, { useNewUrlParser: true })
-    .catch(log);
-};
-
-const startServer = async function() {
-  server = require('../../../index').listen();
-  log('Server listening...');
-};
-
-const closeServer = async function() {
-  await server.close();
-  log('Server stopped');
-};
-
-const clearVets = async function() {
-  await Vet.deleteMany({}).catch(log);
-  await mongoose.connection.db.collection('_slug_ctrs').remove({}).catch(log);
-  log('Vets collection cleared!');
-};
-
-const populateVets = async function() {
-  await Vet.insertMany(vets).catch(log);
-  log('Vets collection populated!');
-};
-
 
 describe('ADMIN Vets integration tests', function() {
-  momentizer();
-
   this.timeout(15000);
 
   let token;
@@ -64,7 +39,7 @@ describe('ADMIN Vets integration tests', function() {
   let regularUser;
 
   before(async () => {
-    startDb();
+    testHelper.startDb();
     admin = new User({
       nickname: 'EnslavedEagle',
       email: 'kontakt@patrykb.pl',
@@ -82,12 +57,30 @@ describe('ADMIN Vets integration tests', function() {
   });
 
 
+  after(() => {
+    // Clear mongoose models so that mocha's --watch works
+    mongoose.models = {};
+    mongoose.modelSchemas = {};
+  })
+
+
   // HTTP integration tests
   describe('Admin Vet routes', () => {
-    before(startServer);
+    before(() => {
+      testHelper.startServer();
+      server = testHelper.server;
+    });
+    
     beforeEach(() => {
-      populateVets();
+      vetHelper.populate();
       token = admin.generateAuthToken();
+    });
+
+    afterEach(() => {
+      vetHelper.clear();
+    });
+    after(() => {
+      testHelper.closeServer();
     });
 
 
@@ -503,22 +496,16 @@ describe('ADMIN Vets integration tests', function() {
         expect(res.status).to.equal(401);
         expect(res.body.message).to.match(/unauthorized/);
       });
+
+      it('should delete vet', async () => {
+        const res = await exec();
+
+        expect(res.status).to.equal(200);
+        
+        const vet = await Vet.findById(knownId);
+        expect(vet).to.be.null;
+      });
     });
-
-    it('should delete vet', async () => {
-      const res = await exec();
-
-      expect(res.status).to.equal(200);
-      
-      const vet = await Vet.findById(knownId);
-      expect(vet).to.be.null;
-    });
-
-    afterEach(clearVets);
-    after(closeServer);
   });
-});
 
-// Clear mongoose models so that mocha's --watch works
-mongoose.models = {};
-mongoose.modelSchemas = {};
+});
