@@ -1,6 +1,6 @@
 const path = require('path');
 const mongoose = require('mongoose');
-const { Vet } = require('../../src/models/vet');
+const { Vet } = require(path.resolve('src/models/vet'));
 
 const vets = [
   { name: 'Abc', address: '123 St.' },
@@ -14,6 +14,10 @@ const vets = [
 ];
 
 class VetHelper {
+  constructor() {
+    this.vets = vets;
+  }
+
   async populate() {
     await Vet.insertMany(vets).catch(err => console.error(err.message));
   }

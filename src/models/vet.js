@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const slugHero = require('mongoose-slug-hero');
+// const slugHero = require('mongoose-slug-hero');
 const Joi = require('joi');
+const slugs = require('mongoose-url-slugs');
 
 const { GeoSchema } = require('./geoschema');
 
@@ -9,19 +10,7 @@ const nameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/i
 const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
 
 const VetSchema = new mongoose.Schema({
-  position: {
-    type: GeoSchema,
-    validate: {
-      validator: value => {
-        const { coordinates } = value;
-        return Array.isArray(coordinates)
-          && coordinates.length === 2
-          && coordinates[0] >= -90 && coordinates[0] <= 90
-          && coordinates[0] >= -180 && coordinates[1] <= 180;
-      },
-      message: 'invalid position'
-    }
-  },
+  position: GeoSchema,
   slug: {
     type: String,
     validate: {
@@ -58,7 +47,19 @@ const VetSchema = new mongoose.Schema({
 
 VetSchema.index({ position: '2dsphere' });
 
-VetSchema.plugin(slugHero, { doc: 'vet', field: 'name' });
+// VetSchema.plugin(slugHero, { doc: 'vet', field: 'name' });
+VetSchema.plugin(slugs('name'));
+
+VetSchema.statics.toCoordinates = (arr) => {
+  if (!Array.isArray(arr)) {
+    throw new Error('Argument must be an array!');
+  }
+  return {
+    type: 'Point',
+    coordinates: arr.slice(0, 2)
+  };
+};
+
 
 const Vet = mongoose.model('Vet', VetSchema);
 

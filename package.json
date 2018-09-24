@@ -29,7 +29,7 @@
     "mocha-logger": "^1.0.6",
     "moment": "^2.22.2",
     "mongoose": "^5.2.13",
-    "mongoose-slug-hero": "^1.1.1",
+    "mongoose-url-slugs": "^1.0.2",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
