@@ -26,6 +26,7 @@ describe('ADMIN Vets DELETE routes', function() {
   let token;
   let admin;
   let regularUser;
+  let knownVet;
 
   before(async () => {
     testHelper.startDb();
@@ -34,6 +35,14 @@ describe('ADMIN Vets DELETE routes', function() {
 
     admin = await authHelper.createAdmin();
     regularUser = await authHelper.createUser();
+    await vetHelper.populate();
+
+    knownVet = await Vet.findOne({}).catch(err => console.error(err));
+  });
+
+
+  beforeEach(() => {
+    token = admin.generateAuthToken();
   });
 
 
@@ -41,27 +50,17 @@ describe('ADMIN Vets DELETE routes', function() {
     // Clear mongoose models so that mocha's --watch works
     mongoose.models = {};
     mongoose.modelSchemas = {};
-    testHelper.closeServer();
-  });
-
-
-  beforeEach(() => {
-    vetHelper.populate();
-    token = admin.generateAuthToken();
-  });
-
-  afterEach(() => {
     vetHelper.clear();
+    testHelper.closeServer();
   });
 
 
   // DELETE /vets
   describe('DELETE /vets', async () => {
     describe('DELETE /vets/:id', async () => {
-      let knownId;
       const exec = () => {
         return request(server)
-          .delete('/admin/vets/' + knownId)
+          .delete('/admin/vets/' + knownVet._id)
           .set('Authorization', `Bearer ${token}`);
       };
 
@@ -74,13 +73,17 @@ describe('ADMIN Vets DELETE routes', function() {
         expect(res.body.message).to.match(/unauthorized/);
       });
 
-      it('should delete vet', async () => {
+      it('should delete vet and return its data in response', async () => {
         const res = await exec();
 
         expect(res.status).to.equal(200);
-        
-        const vet = await Vet.findById(knownId);
-        expect(vet).to.be.null;
+        expect(res.body).to.have.property('vet');
+        expect(res.body.vet).to.be.an('object');
+        expect(res.body.vet).to.have.property('name');
+        expect(res.body.vet.name).to.equal(vetHelper.vets[0].name);
+
+        const vet2 = await Vet.findById(knownVet._id);
+        expect(vet2).to.be.null;
       });
     });
   });

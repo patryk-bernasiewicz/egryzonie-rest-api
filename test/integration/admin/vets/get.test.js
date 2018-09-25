@@ -45,8 +45,8 @@ describe('ADMIN Vets GET routes', function() {
   });
 
 
-  beforeEach(() => {
-    vetHelper.populate();
+  beforeEach(async () => {
+    await vetHelper.populate();
     token = admin.generateAuthToken();
   });
 

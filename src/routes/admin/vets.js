@@ -63,7 +63,7 @@ router.post('/', async (req, res, next) => {
 
   const vet = await new Vet(payload).save().catch(next);
 
-  const location = '/admin/vets' + vet.slug;
+  const location = '/admin/vets/' + vet.slug;
 
   return res.status(201).json({ vet, location });
 });
@@ -89,9 +89,21 @@ router.put('/:id', async (req, res, next) => {
     .findByIdAndUpdate(id, payload, options)
     .catch(err => next(new Error(err.message)));
 
-  const location = '/admin/vets' + vet.slug;
+  const location = '/admin/vets/' + vet.slug;
   
   return res.json({ vet, location });
+});
+
+
+// DELETE /admin/vets/:id
+router.delete('/:id', async (req, res, next) => {
+  const { id } = req.params;
+
+  const vet = await Vet
+    .findByIdAndRemove(id)
+    .catch(err => next(new Error(err.message)));
+
+  return res.json({ vet });
 });
 
 module.exports = router;

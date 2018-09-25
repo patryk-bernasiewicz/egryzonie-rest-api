@@ -28,14 +28,18 @@ describe('Vet Model', () => {
       return new Vet(payload).validateSync();
     };
 
-    it('should reject invalid position', () => {
-      payload.position = { type: 'Point', coordinates: [ -900, -1000 ] };
+    // We no longer validate position!
+    //
+    // it('should reject invalid position', () => {
+    //   payload.position = { type: 'Point', coordinates: [ -900, -1000 ] };
 
-      const validate = exec(payload);
-      expect(validate).to.not.be.undefined;
-      expect(validate.errors).to.haveOwnProperty('position');
-      expect(validate.errors.position.message).to.match(/invalid position/);
-    });
+    //   const validate = exec(payload);
+    //   console.log(validate);
+
+    //   expect(validate).to.not.be.undefined;
+    //   expect(validate.errors).to.haveOwnProperty('position');
+    //   expect(validate.errors.position.message).to.match(/invalid position/);
+    // });
 
     // it('should reject invalid slug', () => {
     //   payload.slug = 'centrum Zdrowia malych';
