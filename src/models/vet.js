@@ -56,7 +56,6 @@ const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9
 
 function validateVet(vet) {
   const schema = {
-    _id: Joi.string(),
     position: Joi.object().keys({
       type: Joi.required(),
       coordinates: Joi.array().items([
@@ -69,10 +68,7 @@ function validateVet(vet) {
     rodents: Joi.boolean().error(new AssertionError('invalid rodents value')),
     exoticAnimals: Joi.boolean().error(new AssertionError('invalid exotic animals value')),
     websiteUrl: Joi.string().regex(urlRegex).error(new AssertionError('invalid website url')),
-    phone: Joi.string().error(new AssertionError('invalid phone number')),
-    accepted: Joi.boolean(),
-    acceptedBy: Joi.allow(),
-    acceptedDate: Joi.date()
+    phone: Joi.string().error(new AssertionError('invalid phone number'))
   };
 
   return Joi.validate(vet, schema);

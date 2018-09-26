@@ -11,25 +11,14 @@ let smallPayload;
 describe('Vet Model', () => {
   beforeEach(() => {
     payload = {
-      _id: new mongoose.Types.ObjectId().toHexString(),
       position: { type: 'Point', coordinates: [ -69.12345, -55.54321 ] },
       name: 'Centrum Zdrowia Małych Zwierząt',
       address: 'Wronki, ul. Poznańska 39',
       rodents: true,
       exoticAnimals: true,
       websiteUrl: 'http://centrumwet.pl',
-      phone: '123 456 789',
-      accepted: true,
-      acceptedBy: { _id: mongoose.Types.ObjectId() },
-      acceptedDate: Date.now()
+      phone: '123 456 789'
     };
-    
-    smallPayload = {
-      _id: new mongoose.Types.ObjectId().toHexString(),
-      position: { type: 'Point', coordinates: [ -69.12345, -55.54321 ] },
-      name: 'Centrum Zdrowia Małych Zwierząt',
-      address: 'Wronki, ul. Poznańska 39',
-    }
   });
 
   describe('Vet validator', () => {

@@ -52,14 +52,14 @@ router.get('/:slug', async (req, res) => {
 // POST /admin/vets
 
 router.post('/', async (req, res, next) => {
-  const { error } = validateVet(req.body);
+  const payload = _.pick(req.body, vetUpdatableFields);
+  payload.position = Vet.toCoordinates(payload.position);
+
+  const { error } = validateVet(payload);
 
   if (error) {
     return res.status(400).json({ message: error.message });
   }
-
-  const payload = _.pick(req.body, vetUpdatableFields);
-  payload.position = Vet.toCoordinates(payload.position);
 
   const vet = await new Vet(payload).save().catch(next);
 
@@ -71,15 +71,15 @@ router.post('/', async (req, res, next) => {
 
 // PUT /admin/vets/:id
 router.put('/:id', async (req, res, next) => {
-  const { error } = validateVet(req.body);
+  const payload = _.pick(req.body, vetUpdatableFields);
+  payload.position = Vet.toCoordinates(payload.position);
+
+  const { error } = validateVet(payload);
   const { id } = req.params;
 
   if (error) {
     return res.status(400).json({ message: error.message });
   }
-
-  const payload = _.pick(req.body, vetUpdatableFields);
-  payload.position = Vet.toCoordinates(payload.position);
 
   const options = {
     new: true
