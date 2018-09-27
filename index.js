@@ -1,10 +1,9 @@
 const express = require('express');
-const winston = require('winston');
 
 const app = express();
 
 require('./startup/passport')(app);
-require('./startup/logging')();
+require('./startup/logging').init();
 require('./startup/routes')(app);
 require('./startup/db')();
 require('./startup/config')();

@@ -70,17 +70,13 @@ userSchema._middleware = {
 userSchema.pre('save', userSchema._middleware.hashPassword);
 
 function validateUser(user) {
-  try {
-    const schema = {
-      nickname: Joi.string().min(5).max(50).regex(nicknameRegex).required(),
-      email: Joi.string().email().min(5).max(255).required(),
-      password: Joi.string().min(5).required()
-    };
+  const schema = {
+    nickname: Joi.string().min(5).max(50).regex(nicknameRegex).required(),
+    email: Joi.string().email().min(5).max(255).required(),
+    password: Joi.string().min(5).required()
+  };
 
-    return Joi.validate(user, schema);
-  } catch (err) {
-    console.error(err.message);
-  }
+  return Joi.validate(user, schema);
 }
 
 exports.userSchema = userSchema;

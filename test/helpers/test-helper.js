@@ -29,6 +29,10 @@ class TestHelper {
     }
   }
 
+  error(error) {
+    console.error(error.message);
+  }
+
 
   // Private methods
   momentize() {

@@ -1,10 +1,10 @@
-const winston = require('winston');
+const path = require('path');
+const { logger } = require(path.resolve('startup/logging'));
 
 const { ValidationError, DatabaseError, AuthorizationError } = require('../error-types');
 
-module.exports = function(err, req, res, next) {
-  winston.error(err.message);
-  console.error('FATAL ERROR!\n', err.message);
+module.exports = function(err, req, res) {
+  logger('FATAL ERROR!\n', err.message);
   
   if (err instanceof ValidationError) {
     return res.status(400).send(err.message);

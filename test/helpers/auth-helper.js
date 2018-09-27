@@ -35,6 +35,10 @@ class AuthHelper {
 
     return user;
   }
+
+  async clear() {
+    await User.remove({});
+  }
 }
 
 

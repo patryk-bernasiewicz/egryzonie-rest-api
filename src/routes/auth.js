@@ -1,26 +1,25 @@
+const path = require('path');
 const router = require('express').Router();
 const passport = require('passport');
 const { User, validateUser } = require('../models/user');
 const _ = require('lodash');
-
-const handleError = err => console.error(err.message);
+const { logger } = require(path.resolve('startup/logging'));
 
 
 
 // POST /auth/signup
-
 router.post('/signup', async (req, res, next) => {
   const { error } = validateUser(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { nickname, email, password } = req.body;
 
-  const existingUser = await User.findOne({ email }).catch(handleError);
+  const existingUser = await User.findOne({ email }).catch(logger);
   if (existingUser) {
     return res.status(400).json({ error: 'user exists' });
   }
 
-  const newUser = await User.create({ nickname, email, password }).catch(handleError);
+  const newUser = await User.create({ nickname, email, password }).catch(logger);
   if (!newUser) {
     return next(new Error('Something went terribly wrong!'));
   }
@@ -33,20 +32,19 @@ router.post('/signup', async (req, res, next) => {
 
 
 // POST /auth/signin
-
-router.post('/signin', async (req, res, next) => {
+router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: 'invalid payload' });
   }
 
-  const user = await User.findOne({ email }).catch(handleError);
+  const user = await User.findOne({ email }).catch(logger);
   if (!user) {
-    return res.status(400).json({ error: 'invalid login' });
+    return res.status(401).json({ error: 'invalid login' });
   }
 
-  const validatePassword = await user.validatePassword(password).catch(handleError);
+  const validatePassword = await user.validatePassword(password).catch(logger);
   if (!validatePassword) {
     return res.status(401).json({ error: 'invalid login' });
   }
@@ -58,9 +56,8 @@ router.post('/signin', async (req, res, next) => {
 
 
 
-// POST /auth/me
-
-router.post('/me', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+// GET /auth/me
+router.get('/me', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (!req.user) {
     return res.status(500).send('Something went terribly wrong!');
   }
