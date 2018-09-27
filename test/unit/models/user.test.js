@@ -7,10 +7,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const sinon = require('sinon');
-const sinonChai = require('sinon-chai');
-chai.use(sinonChai);
-
-require('sinon-mongoose');
 
 const expect = chai.expect;
 
