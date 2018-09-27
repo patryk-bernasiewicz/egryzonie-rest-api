@@ -50,7 +50,6 @@ VetSchema.statics.toCoordinates = (arr) => {
 
 const Vet = mongoose.model('Vet', VetSchema);
 
-const slugRegex = /^[a-z0-9-]{1,}$/;
 const nameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/i;
 const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
 
