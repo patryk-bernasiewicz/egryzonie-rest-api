@@ -23,6 +23,7 @@ let server;
 describe('ADMIN Vets DELETE routes', function() {
   this.timeout(15000);
 
+  let vets;
   let token;
   let admin;
   let regularUser;
@@ -32,12 +33,14 @@ describe('ADMIN Vets DELETE routes', function() {
     testHelper.startDb();
     testHelper.startServer();
     server = testHelper.server;
+    
+    await vetHelper.clear();
 
     admin = await authHelper.createAdmin();
     regularUser = await authHelper.createUser();
-    await vetHelper.populate();
+    vets = await vetHelper.populate();
 
-    knownVet = await Vet.findOne({}).catch(err => console.error(err));
+    knownVet = vets[0];
   });
 
 
@@ -46,11 +49,11 @@ describe('ADMIN Vets DELETE routes', function() {
   });
 
 
-  after(() => {
+  after(async () => {
     // Clear mongoose models so that mocha's --watch works
     mongoose.models = {};
     mongoose.modelSchemas = {};
-    vetHelper.clear();
+    await vetHelper.clear();
     testHelper.closeServer();
   });
 
@@ -80,7 +83,7 @@ describe('ADMIN Vets DELETE routes', function() {
         expect(res.body).to.have.property('vet');
         expect(res.body.vet).to.be.an('object');
         expect(res.body.vet).to.have.property('name');
-        expect(res.body.vet.name).to.equal(vetHelper.vets[0].name);
+        expect(res.body.vet.name).to.equal(vets[0].name);
 
         const vet2 = await Vet.findById(knownVet._id);
         expect(vet2).to.be.null;

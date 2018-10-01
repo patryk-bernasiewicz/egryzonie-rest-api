@@ -32,26 +32,26 @@ describe('ADMIN Vets GET routes', function() {
     testHelper.startServer();
     server = testHelper.server;
 
+    await vetHelper.clear();
+
     admin = await authHelper.createAdmin();
     regularUser = await authHelper.createUser();
   });
 
 
-  after(() => {
+  after(async () => {
     // Clear mongoose models so that mocha's --watch works
     mongoose.models = {};
     mongoose.modelSchemas = {};
     testHelper.closeServer();
+    
+    await vetHelper.clear();
   });
 
 
   beforeEach(async () => {
     await vetHelper.populate();
     token = admin.generateAuthToken();
-  });
-
-  afterEach(() => {
-    vetHelper.clear();
   });
 
 
