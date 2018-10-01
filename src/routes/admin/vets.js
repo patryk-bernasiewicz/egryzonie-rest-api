@@ -5,8 +5,7 @@ const _ = require('lodash');
 const querymen = require('querymen');
 const { Vet, validateVet, vetUpdatableFields } = require(path.resolve('src/models/vet'));
 const adminGuard = require(path.resolve('src/middleware/admin-guard'));
-
-const error = err => console.error(err.message);
+const { logger } = require(path.resolve('startup/logging'));
 
 const querySchema = new querymen.Schema({
   term: {
@@ -27,7 +26,7 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .catch(error);
+    .catch(logger);
 
   return res.status(200).json(vets);
 });
@@ -39,7 +38,7 @@ router.get('/:slug', async (req, res) => {
   const slug = req.params.slug || '';
   const vet = await Vet
     .findOne({ slug })
-    .catch(error);
+    .catch(logger);
 
   if (!vet) {
     return res.status(404).json({ message: 'no vet found' });

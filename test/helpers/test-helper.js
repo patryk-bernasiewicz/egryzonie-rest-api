@@ -15,7 +15,7 @@ class TestHelper {
     const dbConfig = config.get('db');
     this.db = await mongoose
       .connect(dbConfig, { useNewUrlParser: true })
-      .catch(console.log);
+      .catch(err => console.error(err.message));
   }
 
   startServer() {

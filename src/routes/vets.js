@@ -21,4 +21,19 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
   return res.json(vets);
 });
 
+// GET /vets/:slug
+router.get('/:slug', async (req, res, next) => {
+  const { slug } = req.params;
+
+  const vet = await Vet
+    .findOne({ slug })
+    .catch(err => next(new Error(err.message)));
+
+  if (!vet) {
+    return res.sendStatus(404);
+  }
+
+  return res.status(200).json({ vet });
+});
+
 module.exports = router;

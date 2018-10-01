@@ -1,5 +1,6 @@
 const path = require('path');
 const mongoose = require('mongoose');
+const async = require('async');
 const { Vet } = require(path.resolve('src/models/vet'));
 
 const vets = [
@@ -15,16 +16,38 @@ const vets = [
 
 class VetHelper {
   constructor() {
-    this.vets = vets;
+    this.vets = [];
   }
 
   async populate() {
-    await Vet.insertMany(vets).catch(err => console.error(err.message));
+    return new Promise((resolve, reject) => {
+      async.each(vets, this._save.bind(this), err => {
+        if (err) reject(err);
+        this.vets.sort((a, b) => a.name > b.name);
+        resolve(this.vets);
+      });
+    });
+  }
+  
+  async createOne() {
+    await Vet
+      .create(this.vets[0])
+      .catch(err => console.error(err.message));
   }
 
   async clear() {
-    await Vet.deleteMany({}).catch(err => console.error(err.message));
-    await mongoose.connection.db.collection('_slug_ctrs').remove({}).catch(console.log);
+    await Vet
+      .deleteMany({})
+      .catch(err => console.error(err.message));
+    await mongoose.connection.db.collection('_slug_ctrs')
+      .remove({})
+      .catch(err => console.error(err.message));
+  }
+
+  // private methods
+  async _save(vet) {
+    const savedVet = await new Vet(vet).save().catch(err => console.error(err.message));
+    this.vets.push(savedVet);
   }
 }
 
