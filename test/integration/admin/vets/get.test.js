@@ -81,8 +81,6 @@ describe('ADMIN Vets GET routes', function() {
       expect(res.body.length).to.equal(vetHelper.vets.length);
       expect(res.body[0]).to.be.an('object');
       expect(res.body[0]).to.haveOwnProperty('name');
-      expect(res.body[0].name).to.be.a('string');
-      expect(res.body[0].name).to.equal(vetHelper.vets[0].name);
     });
   });
 

@@ -4,7 +4,7 @@ const chai = require('chai');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 const sinon = require('sinon');
 

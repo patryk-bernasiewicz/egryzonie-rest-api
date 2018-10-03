@@ -37,14 +37,6 @@ describe('ADMIN Vets POST routes', function() {
   });
 
 
-  after(() => {
-    // Clear mongoose models so that mocha's --watch works
-    mongoose.models = {};
-    mongoose.modelSchemas = {};
-    testHelper.closeServer();
-  });
-
-
   beforeEach(() => {
     vetHelper.populate();
     token = admin.generateAuthToken();
@@ -52,6 +44,9 @@ describe('ADMIN Vets POST routes', function() {
 
   afterEach(() => {
     vetHelper.clear();
+    // Clear mongoose models so that mocha's --watch works
+    mongoose.models = {};
+    mongoose.modelSchemas = {};
   });
 
 

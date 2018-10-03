@@ -1,27 +1,30 @@
 const path = require('path');
 const router = require('express').Router();
 const passport = require('passport');
-const { User, validateUser } = require('../models/user');
+const { User, validateUser } = require(path.resolve('src/models/user'));
 const _ = require('lodash');
-const { logger } = require(path.resolve('startup/logging'));
-
-
+const error = require(path.resolve('src/helpers/error-helper'));
 
 // POST /auth/signup
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', async (req, res) => {
   const { error } = validateUser(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { nickname, email, password } = req.body;
 
-  const existingUser = await User.findOne({ email }).catch(logger);
+  const existingUser = await User
+    .findOne({ email })
+    .catch(error.database);
+
   if (existingUser) {
     return res.status(400).json({ error: 'user exists' });
   }
 
-  const newUser = await User.create({ nickname, email, password }).catch(logger);
+  const newUser = await User
+    .create({ nickname, email, password })
+    .catch(error.database);
   if (!newUser) {
-    return next(new Error('Something went terribly wrong!'));
+    throw new Error('Something went terribly wrong!');
   }
 
   const token = newUser.generateAuthToken();
@@ -39,12 +42,18 @@ router.post('/signin', async (req, res) => {
     return res.status(400).json({ error: 'invalid payload' });
   }
 
-  const user = await User.findOne({ email }).catch(logger);
+  const user = await User
+    .findOne({ email })
+    .catch(error.database);
+  
   if (!user) {
     return res.status(401).json({ error: 'invalid login' });
   }
 
-  const validatePassword = await user.validatePassword(password).catch(logger);
+  const validatePassword = await user
+    .validatePassword(password)
+    .catch(error.internal);
+
   if (!validatePassword) {
     return res.status(401).json({ error: 'invalid login' });
   }

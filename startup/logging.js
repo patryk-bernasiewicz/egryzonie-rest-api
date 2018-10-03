@@ -1,6 +1,5 @@
 const { createLogger, format, transports, exceptions } = require('winston');
 const { combine, timestamp, label, printf } = format;
-require('express-async-errors');
 
 const myFormat = printf(info => {
   return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
@@ -24,7 +23,7 @@ exports.init = function() {
 
   process.on('unhandledRejection', error => {
     // Will print "unhandledRejection err is not defined"
-    logger('unhandledRejection', error);
+    logger.error('unhandledRejection', error);
   });
 };
 

@@ -1,7 +1,7 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Joi = require('joi');
 
 const nicknameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/;
@@ -52,16 +52,14 @@ userSchema.methods.generateAuthToken = function() {
 
 userSchema.methods.validatePassword = function(password) {
   return bcrypt.compare(password, this.password);
-}
+};
 
 userSchema._middleware = {
   hashPassword: async function(next) {
-    const salt = await bcrypt.genSalt(6);
-    const hash = await bcrypt.hash(this.password, salt);
+    const salt = await bcrypt.genSalt(6).catch(next);
+    const hash = await bcrypt.hash(this.password, salt).catch(next);
 
     this.password = hash;
-
-    next();
 
     return Promise.resolve(true);
   }

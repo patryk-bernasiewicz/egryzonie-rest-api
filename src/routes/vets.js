@@ -1,6 +1,8 @@
+const path = require('path');
 const router = require('express').Router();
 const querymen = require('querymen');
-const { Vet } = require('../models/vet');
+const { Vet } = require(path.resolve('src/models/vet'));
+const error = require(path.resolve('src/helpers/error-helper'));
 
 const querySchema = new querymen.Schema({
   term: {
@@ -16,18 +18,19 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
     .find(search)
     .skip(skip)
     .limit(limit)
-    .sort(sort);
+    .sort(sort)
+    .catch(error.database);
 
   return res.json(vets);
 });
 
 // GET /vets/:slug
-router.get('/:slug', async (req, res, next) => {
+router.get('/:slug', async (req, res) => {
   const { slug } = req.params;
 
   const vet = await Vet
     .findOne({ slug })
-    .catch(err => next(new Error(err.message)));
+    .catch(error.database);
 
   if (!vet) {
     return res.sendStatus(404);
