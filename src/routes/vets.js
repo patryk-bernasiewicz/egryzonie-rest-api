@@ -18,8 +18,7 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
     .find(search)
     .skip(skip)
     .limit(limit)
-    .sort(sort)
-    .catch(error.database);
+    .sort(sort);
 
   return res.json(vets);
 });
@@ -30,7 +29,6 @@ router.get('/:slug', async (req, res) => {
 
   const vet = await Vet
     .findOne({ slug })
-    .catch(error.database);
 
   if (!vet) {
     return res.sendStatus(404);

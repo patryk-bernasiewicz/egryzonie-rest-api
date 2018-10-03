@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 const slugs = require('mongoose-url-slugs');
 const { AssertionError } = require('../error-types');
-
 const { GeoSchema } = require('./geoschema');
 
 const VetSchema = new mongoose.Schema({
@@ -35,31 +34,23 @@ const VetSchema = new mongoose.Schema({
 
 VetSchema.index({ position: '2dsphere' });
 
-// VetSchema.plugin(slugHero, { doc: 'vet', field: 'name' });
 VetSchema.plugin(slugs('name'));
-
-VetSchema.pre('save', function(next) {
-  if (!this.position || !Array.isArray(this.position)) {
-    delete this.position;
-    return next();
-  }
-  const type = 'Point';
-  const coordinates = this.position;
-  this.position = { type, coordinates };
-  return next();
-});
 
 const Vet = mongoose.model('Vet', VetSchema);
 
 const nameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/i;
 const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
 
-function validateVet(vet) {
+// Validation middleware
+function validateVet(payload) {
   const schema = {
-    position: Joi.array().items([
-      Joi.number().min(-180).max(180).required(),
-      Joi.number().min(-90).max(90).required()
-    ]).error(new AssertionError('invalid position')),
+    position: Joi.object().keys({
+      type: Joi.string().optional(),
+      coordinates: Joi.array().items(
+        Joi.number().min(-90).max(90).required(),
+        Joi.number().min(-180).max(180).required()
+      )
+    }).error(new AssertionError('invalid position')),
     googleId: Joi.string().error(new AssertionError('invalid google id')),
     name: Joi.string().regex(nameRegex).required().error(new AssertionError('invalid name')),
     address: Joi.string().required().error(new AssertionError('invalid address')),
@@ -69,7 +60,7 @@ function validateVet(vet) {
     phone: Joi.string().error(new AssertionError('invalid phone number'))
   };
 
-  return Joi.validate(vet, schema);
+  return Joi.validate(payload, schema);
 }
 
 exports.Vet = Vet;

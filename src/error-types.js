@@ -1,23 +1,19 @@
-exports.AssertionError = class ValidationError extends Error {
+class AssertionError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 400;
     this.name = 'Assertion Error';
   }
-};
+}
 
-exports.DatabaseError = class DatabaseError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 500;
-    this.name = 'Database Error';
-  }
-};
-
-exports.AuthorizationError = class AuthorizationError extends Error {
+class AuthorizationError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 401;
     this.name = 'Authorization Error';
   }
-};
+}
+
+
+exports.AssertionError = AssertionError;
+exports.AuthorizationError = AuthorizationError;

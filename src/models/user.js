@@ -54,14 +54,11 @@ userSchema.methods.validatePassword = function(password) {
   return bcrypt.compare(password, this.password);
 };
 
-userSchema._middleware = {
-  hashPassword: async function(next) {
-    const salt = await bcrypt.genSalt(6).catch(next);
-    const hash = await bcrypt.hash(this.password, salt).catch(next);
-
+userSchema._middleware = {  
+  hashPassword: async function() {
+    const salt = await bcrypt.genSalt(6);
+    const hash = await bcrypt.hash(this.password, salt);
     this.password = hash;
-
-    return Promise.resolve(true);
   }
 };
 

@@ -25,20 +25,17 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
     .find(search)
     .skip(skip)
     .limit(limit)
-    .sort(sort)
-    .catch(error.database);
+    .sort(sort);
 
   return res.status(200).json(vets);
 });
 
 
 // GET /admin/vets/:slug
-
 router.get('/:slug', async (req, res) => {
   const slug = req.params.slug || '';
   const vet = await Vet
-    .findOne({ slug })
-    .catch(error.database);
+    .findOne({ slug });
 
   if (!vet) {
     return res.status(404).json({ message: 'no vet found' });
@@ -49,20 +46,15 @@ router.get('/:slug', async (req, res) => {
 
 
 // POST /admin/vets
-
 router.post('/', async (req, res) => {
   const payload = _.pick(req.body, vetUpdatableFields);
   
-  const { error } = validateVet(payload);
-
-  if (error) {
-    return res.status(400).json({ message: error.message });
+  const validate = validateVet(payload);
+  if (validate.error) {
+    return res.status(400).json({ message: validate.error.message });
   }
-
-  const vet = await new Vet(payload)
-    .save()
-    .catch(error.database);
-
+  
+  const vet = await Vet.create(payload);
   const location = '/admin/vets/' + vet.slug;
 
   return res.status(201).json({ vet, location });
@@ -71,13 +63,12 @@ router.post('/', async (req, res) => {
 
 // PUT /admin/vets/:id
 router.put('/:id', async (req, res) => {
-  const payload = _.pick(req.body, vetUpdatableFields);
-
-  const { error } = validateVet(payload);
   const { id } = req.params;
-
-  if (error) {
-    return res.status(400).json({ message: error.message });
+  const payload = _.pick(req.body, vetUpdatableFields);
+  
+  const validate = validateVet(payload);
+  if (validate.error) {
+    return res.status(400).json({ message: validate.error.message });
   }
 
   const options = {
@@ -85,8 +76,7 @@ router.put('/:id', async (req, res) => {
   };
 
   const vet = await Vet
-    .findByIdAndUpdate(id, payload, options)
-    .catch(error.database);
+    .findByIdAndUpdate(id, payload, options);
 
   const location = '/admin/vets/' + vet.slug;
   
@@ -99,8 +89,7 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   const vet = await Vet
-    .findByIdAndRemove(id)
-    .catch(error.database);
+    .findByIdAndRemove(id);
 
   return res.json({ vet });
 });

@@ -3,10 +3,7 @@ const passportJWT = require('passport-jwt');
 const config = require('config');
 const _ = require('lodash');
 
-const mongoose = require('mongoose');
 const { User } = require('../src/models/user');
-
-const error = err => console.error(err.message);
 
 // OAuth2 Profile Callback
 async function facebookCallback(accessToken, refreshToken, profile, done) {
@@ -14,7 +11,6 @@ async function facebookCallback(accessToken, refreshToken, profile, done) {
   user = await User
     .findOne({ FacebookID: profile.id })
     .catch(err => {
-      console.error(err.message);
       return done(null, false, { message: 'error while registering through facebook: ' + err.message });
     });
   if (!user) {
@@ -26,7 +22,6 @@ async function facebookCallback(accessToken, refreshToken, profile, done) {
     })
       .save()
       .catch(err => {
-        error(err);
         return done(null, false, { message: 'error while registering through facebook: ' + err.message });
       });
     return done(null, user);
@@ -52,7 +47,6 @@ async function googleCallback(accessToken, refreshToken, profile, done) {
     })
       .save()
       .catch(err => {
-        error(err);
         return done(null, false, { message: 'Error while registering user through Google: ' + err.message });
       });
   }
@@ -68,8 +62,7 @@ const opts = {
 };
 passport.use('jwt', new Strategy(opts, async (jwtPayload, done) => {
   const user = await User
-    .findById(jwtPayload._id)
-    .catch(error);
+    .findById(jwtPayload._id);
   if (!user) {
     return done(null, false);
   }
@@ -95,17 +88,16 @@ passport.use('jwt', new Strategy(opts, async (jwtPayload, done) => {
 
 // Passport stuff
 passport.serializeUser(function(user, done) {
-  return done(null, { user: { id, role }});
+  return done(null, { user: { id: user.id, role: user.role }});
 });
 
 passport.deserializeUser(async function({ id }, done) {
   const user = await User
     .findById(id)
     .catch(err => {
-      console.error(err.message);
       return done(err, null);
     });
-  return done(err, user);
+  return done(null, user);
 });
 
 

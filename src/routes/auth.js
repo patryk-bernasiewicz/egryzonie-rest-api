@@ -7,22 +7,19 @@ const error = require(path.resolve('src/helpers/error-helper'));
 
 // POST /auth/signup
 router.post('/signup', async (req, res) => {
-  const { error } = validateUser(req.body);
-  if (error) return res.status(400).json({ error: error.details[0].message });
+  const validate = validateUser(req.body);
+  if (validate.error) return res.status(400).json({ error: validate.error.details[0].message });
 
   const { nickname, email, password } = req.body;
 
   const existingUser = await User
-    .findOne({ email })
-    .catch(error.database);
-
+    .findOne({ email });
   if (existingUser) {
     return res.status(400).json({ error: 'user exists' });
   }
 
   const newUser = await User
-    .create({ nickname, email, password })
-    .catch(error.database);
+    .create({ nickname, email, password });
   if (!newUser) {
     throw new Error('Something went terribly wrong!');
   }
@@ -43,16 +40,14 @@ router.post('/signin', async (req, res) => {
   }
 
   const user = await User
-    .findOne({ email })
-    .catch(error.database);
+    .findOne({ email });
   
   if (!user) {
     return res.status(401).json({ error: 'invalid login' });
   }
 
   const validatePassword = await user
-    .validatePassword(password)
-    .catch(error.internal);
+    .validatePassword(password);
 
   if (!validatePassword) {
     return res.status(401).json({ error: 'invalid login' });

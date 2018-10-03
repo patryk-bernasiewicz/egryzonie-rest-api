@@ -21,7 +21,7 @@ const { User } = require(path.resolve('src/models/user'));
 let server;
 
 describe('ADMIN Vets POST routes', function() {
-  this.timeout(15000);
+  this.timeout(5000);
 
   let token;
   let admin;
@@ -55,7 +55,10 @@ describe('ADMIN Vets POST routes', function() {
     let payload;
     beforeEach(() => {
       payload = {
-        position: [-39.987654, 39.456789],
+        position: {
+          type: 'Point',
+          coordinates: [ -39.123456, 39.654321 ]
+        },
         name: 'A Newly Added Vet',
         address: '4914 St Random Street, V5T 1Z7 Vancouver, British Columbia, Canada',
         rodents: true,
@@ -192,7 +195,6 @@ describe('ADMIN Vets POST routes', function() {
       expect(foundVet).to.not.be.null;
       expect(foundVet).to.have.property('name');
       expect(foundVet.name).to.equal(payload.name);
-
       expect(foundVet.name).to.equal(res.body.vet.name);
     });
 

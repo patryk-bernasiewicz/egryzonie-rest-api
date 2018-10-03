@@ -71,7 +71,9 @@ describe('ADMIN Vets PUT routes', function() {
 
     beforeEach(() => {
       payload = {
-        position: [ 15.000000, 15.000000 ],
+        position: {
+          coordinates: [ 15.000000, 15.000000 ]
+        },
         name: 'Even More Newly Added Vet',
         address: '2137 rue Principale, La Sarre, Quebec, Canada',
         rodents: true,

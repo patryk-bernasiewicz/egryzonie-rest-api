@@ -28,49 +28,19 @@ describe('User Model', () => {
       return new User(payload).validateSync();
     };
 
-    it('should reject invalid nickname', () => {
+    it('should reject invalid payload', () => {
       payload.nickname = '##EnslavedEagle';
       
       const validate = exec(payload);
 
-      expect(validate).to.not.be.undefined;
-      expect(validate.errors).to.haveOwnProperty('nickname');
-      expect(validate.errors.nickname.message).to.match(/invalid nickname/);
-    });
-
-    it('should reject invalid email', () => {
-      payload.email = 'invalid!@#email@gmail.com';
-
-      const validate = exec(payload);
-
-      expect(validate).to.not.be.undefined;
-      expect(validate.errors).to.haveOwnProperty('email');
-      expect(validate.errors.email.message).to.match(/invalid email/);
-    });
-
-    it('should reject invalid password', () => {
-      payload.password = '1';
-
-      const validate = exec(payload);
-
-      expect(validate).to.not.be.undefined;
-      expect(validate.errors).to.haveOwnProperty('password');
-      expect(validate.errors.password.message).to.match(/is shorter than the minimum/);
-    });
-
-    it('should reject invalid role', () => {
-      payload.role = 'supersuperadmin';
-
-      const validate = exec(payload);
-
-      expect(validate).to.not.be.undefined;
-      expect(validate.errors).to.haveOwnProperty('role');
-      expect(validate.errors.role.message).to.match(/is not a valid enum value/);
+      expect(validate).to.have.property('errors');
+      expect(validate.errors).to.not.be.empty;
+      expect(validate.errors).to.have.property('nickname');
     });
 
     it('should be okay if payload is valid', () => {
       const validate = exec(payload);
-
+      
       expect(validate).to.be.undefined;
     });
   });
@@ -88,18 +58,13 @@ describe('User Model', () => {
     });
   });
 
-  describe('User pre-save hook: hash password', () => {
+  describe('User._middleware.hashPassword()', () => {
     it('should hash the password before saving', async () => {
-      let ctx = _.clone(payload);
-      const spy = sinon.spy();
-
+      const ctx = _.clone(payload);
       const bound = _.bind(userSchema._middleware.hashPassword, ctx);
-      await bound(spy);
-
-      const decoded = await bcrypt.compare(payload.password, ctx.password);
+      await bound();
       
-      sinon.assert.calledOnce(spy);
-      expect(decoded).to.be.true;
+      expect(ctx.password).to.match(/^\$2[ayb]\$.{56}$/);
     });
   });
 });
