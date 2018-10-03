@@ -8,6 +8,7 @@ const { GeoSchema } = require('./geoschema');
 
 const VetSchema = new mongoose.Schema({
   position: GeoSchema,
+  googleId: String,
   slug: String,
   name: {
     type: String,
@@ -37,16 +38,16 @@ VetSchema.index({ position: '2dsphere' });
 // VetSchema.plugin(slugHero, { doc: 'vet', field: 'name' });
 VetSchema.plugin(slugs('name'));
 
-VetSchema.statics.toCoordinates = (arr) => {
-  if (!Array.isArray(arr)) {
-    throw new Error('Argument must be an array!');
+VetSchema.pre('save', function(next) {
+  if (!this.position || !Array.isArray(this.position)) {
+    delete this.position;
+    return next();
   }
-  return {
-    type: 'Point',
-    coordinates: arr.slice(0, 2)
-  };
-};
-
+  const type = 'Point';
+  const coordinates = this.position;
+  this.position = { type, coordinates };
+  return next();
+});
 
 const Vet = mongoose.model('Vet', VetSchema);
 
@@ -55,13 +56,11 @@ const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9
 
 function validateVet(vet) {
   const schema = {
-    position: Joi.object().keys({
-      type: Joi.required(),
-      coordinates: Joi.array().items([
-        Joi.number().min(-180).max(180).required(),
-        Joi.number().min(-90).max(90).required()
-      ]).required()
-    }).error(new AssertionError('invalid position')),
+    position: Joi.array().items([
+      Joi.number().min(-180).max(180).required(),
+      Joi.number().min(-90).max(90).required()
+    ]).error(new AssertionError('invalid position')),
+    googleId: Joi.string().error(new AssertionError('invalid google id')),
     name: Joi.string().regex(nameRegex).required().error(new AssertionError('invalid name')),
     address: Joi.string().required().error(new AssertionError('invalid address')),
     rodents: Joi.boolean().error(new AssertionError('invalid rodents value')),
@@ -76,4 +75,4 @@ function validateVet(vet) {
 exports.Vet = Vet;
 exports.VetSchema = VetSchema;
 exports.validateVet = validateVet;
-exports.vetUpdatableFields = ['position', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone'];
+exports.vetUpdatableFields = ['position', 'googleId', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone'];

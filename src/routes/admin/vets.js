@@ -52,7 +52,6 @@ router.get('/:slug', async (req, res) => {
 
 router.post('/', async (req, res, next) => {
   const payload = _.pick(req.body, vetUpdatableFields);
-  payload.position = Vet.toCoordinates(payload.position);
 
   const { error } = validateVet(payload);
 
@@ -71,7 +70,6 @@ router.post('/', async (req, res, next) => {
 // PUT /admin/vets/:id
 router.put('/:id', async (req, res, next) => {
   const payload = _.pick(req.body, vetUpdatableFields);
-  payload.position = Vet.toCoordinates(payload.position);
 
   const { error } = validateVet(payload);
   const { id } = req.params;
