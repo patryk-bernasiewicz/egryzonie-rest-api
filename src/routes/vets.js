@@ -2,7 +2,6 @@ const path = require('path');
 const router = require('express').Router();
 const querymen = require('querymen');
 const { Vet } = require(path.resolve('src/models/vet'));
-const error = require(path.resolve('src/helpers/error-helper'));
 
 const querySchema = new querymen.Schema({
   term: {

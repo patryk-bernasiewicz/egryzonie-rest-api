@@ -20,8 +20,6 @@ router.use('/admin', admin);
 
 // Error Handling Middleware
 router.use((err, req, res) => {
-  console.log('Does error even get called?');
-  console.log(err.message);
   return res.status(err.statusCode).json({ message: err.message });
 });
 
