@@ -19,7 +19,8 @@ router.use('/vets', vets);
 router.use('/admin', admin);
 
 // Error Handling Middleware
-router.use((err, req, res) => {
+router.use((err, req, res, next) => {
+  console.log(err, req, res, next);
   return res.status(err.statusCode).json({ message: err.message });
 });
 

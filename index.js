@@ -1,13 +1,23 @@
 const express = require('express');
 require('express-async-errors');
+const cors = require('cors');
+const config = require('config');
 
 const app = express();
 
+const origin = config.get('allowedOrigins').split(';') || ['http://localhost:4200', 'http://localhost:4000'];
+
+app.use(cors({
+  origin,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+require('./startup/config')();
 require('./startup/passport')(app);
 require('./startup/logging').init();
 require('./startup/routes')(app);
 require('./startup/db')();
-require('./startup/config')();
 require('./startup/validation')();
 require('./startup/prod')(app);
 

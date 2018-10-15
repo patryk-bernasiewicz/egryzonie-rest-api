@@ -1,4 +1,5 @@
 {
   "jwtPrivateKey": "egryzonie_jwtPrivateKey",
-  "db": "egryzonie_db"
+  "db": "egryzonie_db",
+  "allowedOrigins": "egryzonie_allowedOrigins"
 }
