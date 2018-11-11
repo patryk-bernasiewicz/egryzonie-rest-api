@@ -10,12 +10,13 @@ const origin = config.get('allowedOrigins').split(';') || ['http://localhost:420
 app.use(cors({
   origin,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['x-auth-token']
 }));
 
 require('./startup/config')();
 require('./startup/passport')(app);
-require('./startup/logging').init();
+require('./startup/logging').init(app);
 require('./startup/routes')(app);
 require('./startup/db')();
 require('./startup/validation')();
