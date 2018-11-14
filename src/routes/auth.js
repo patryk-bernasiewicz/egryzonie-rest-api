@@ -3,7 +3,6 @@ const router = require('express').Router();
 const passport = require('passport');
 const { User, validateUser } = require(path.resolve('src/models/user'));
 const _ = require('lodash');
-const error = require(path.resolve('src/helpers/error-helper'));
 
 // POST /auth/signup
 router.post('/signup', async (req, res) => {
@@ -13,7 +12,7 @@ router.post('/signup', async (req, res) => {
   const { nickname, email, password } = req.body;
 
   const existingUser = await User
-    .findOne({ email });
+    .findOne({ email }, 'username role');
   if (existingUser) {
     return res.status(400).json({ error: 'user exists' });
   }
@@ -26,7 +25,7 @@ router.post('/signup', async (req, res) => {
 
   const token = newUser.generateAuthToken();
 
-  return res.status(201).header('x-auth-token', token).send();
+  return res.status(201).header('x-auth-token', token).json(_.pick(newUser, ['nickname', 'email', 'role']));
 });
 
 
@@ -55,7 +54,7 @@ router.post('/signin', async (req, res) => {
 
   const token = user.generateAuthToken();
 
-  return res.status(201).header('x-auth-token', token).send();
+  return res.status(201).header('x-auth-token', token).json(_.pick(user, ['nickname', 'role']));
 });
 
 

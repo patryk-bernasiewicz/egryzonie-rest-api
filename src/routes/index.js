@@ -1,5 +1,6 @@
 const path = require('path');
 const router = require('express').Router();
+const logger = require('../helpers/logger');
 
 const express = require('express');
 const auth = require(path.resolve('src/routes/auth'));
@@ -19,8 +20,8 @@ router.use('/vets', vets);
 router.use('/admin', admin);
 
 // Error Handling Middleware
-router.use((err, req, res, next) => {
-  console.log(err, req, res, next);
+router.use((err, req, res) => {
+  logger.error(`${err.message}\n\n${err.stack}\n\n`);
   return res.status(err.statusCode).json({ message: err.message });
 });
 

@@ -1,20 +1,6 @@
 const morgan = require('morgan');
-const { createLogger, format, transports, exceptions } = require('winston');
-const { combine, timestamp, label, printf } = format;
-
-const myFormat = printf(info => {
-  return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
-});
-
-const logger = createLogger({
-  level: 'error',
-  format: combine(
-    label({ label: 'ERROR!' }),
-    timestamp(),
-    myFormat
-  ),
-  transports: [new transports.Console()]
-});
+const { transports, exceptions } = require('winston');
+const logger = require('../src/helpers/logger');
 
 exports.init = function(app) {
   exceptions.handle(
@@ -23,7 +9,6 @@ exports.init = function(app) {
   );
 
   process.on('unhandledRejection', error => {
-    // Will print "unhandledRejection err is not defined"
     logger.error('unhandledRejection', error);
   });
 
@@ -39,5 +24,3 @@ exports.init = function(app) {
     );
   }
 };
-
-exports.logger = logger;

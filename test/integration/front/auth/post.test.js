@@ -89,6 +89,15 @@ describe('Auth integration tests', function() {
       expect(res.body).to.be.an('object');
       expect(res.header['x-auth-token']).to.not.be.null;
 
+      expect(res.body).to.have.property('nickname');
+      expect(res.body.nickname).to.equal(payload.nickname);
+
+      expect(res.body).to.have.property('role');
+      expect(res.body.role).to.equal('user');
+
+      expect(res.body).to.not.have.property('password');
+      expect(res.body).to.not.have.property('avatarURL');
+
       const deserialized = jwt.verify(res.header['x-auth-token'], config.get('jwtPrivateKey'));
       const validated = mongoose.Types.ObjectId.isValid(deserialized._id);
 
@@ -148,6 +157,14 @@ describe('Auth integration tests', function() {
 
       expect(res.status).to.equal(201);
       expect(res.header['x-auth-token']).to.not.be.null;
+
+      expect(res.body).to.have.property('nickname');
+      expect(res.body.nickname).to.equal(payload.nickname);
+
+      expect(res.body).to.have.property('role');
+      expect(res.body.role).to.equal('user');
+
+      expect(res.body).to.not.have.property('password');
 
       const deserialized = jwt.verify(res.header['x-auth-token'], config.get('jwtPrivateKey'));
       const validated = mongoose.Types.ObjectId.isValid(deserialized._id);
