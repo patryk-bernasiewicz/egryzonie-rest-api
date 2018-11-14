@@ -7,14 +7,14 @@ const _ = require('lodash');
 // POST /auth/signup
 router.post('/signup', async (req, res) => {
   const validate = validateUser(req.body);
-  if (validate.error) return res.status(400).json({ error: validate.error.details[0].message });
+  if (validate.error) return res.status(400).json({ message: validate.error.details[0].message });
 
   const { nickname, email, password } = req.body;
 
   const existingUser = await User
     .findOne({ email }, 'username role');
   if (existingUser) {
-    return res.status(400).json({ error: 'user exists' });
+    return res.status(400).json({ message: 'user exists' });
   }
 
   const newUser = await User
@@ -35,21 +35,21 @@ router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: 'invalid payload' });
+    return res.status(400).json({ message: 'invalid payload' });
   }
 
   const user = await User
     .findOne({ email });
   
   if (!user) {
-    return res.status(401).json({ error: 'invalid login' });
+    return res.status(401).json({ message: 'invalid login' });
   }
 
   const validatePassword = await user
     .validatePassword(password);
 
   if (!validatePassword) {
-    return res.status(401).json({ error: 'invalid login' });
+    return res.status(401).json({ message: 'invalid login' });
   }
 
   const token = user.generateAuthToken();

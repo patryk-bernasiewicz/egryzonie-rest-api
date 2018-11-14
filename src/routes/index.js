@@ -22,7 +22,12 @@ router.use('/admin', admin);
 // Error Handling Middleware
 router.use((err, req, res) => {
   logger.error(`${err.message}\n\n${err.stack}\n\n`);
-  return res.status(err.statusCode).json({ message: err.message });
+
+  if (process.env.NODE_ENV !== 'development') {
+    delete err.stack;
+  }
+
+  return res.status(err.statusCode || 500).json(err);
 });
 
 module.exports = router;

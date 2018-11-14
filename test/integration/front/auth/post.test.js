@@ -56,8 +56,8 @@ describe('Auth integration tests', function() {
       const res = await exec();
 
       expect(res.status).to.equal(400);
-      expect(res.body).to.haveOwnProperty('error');
-      expect(res.body.error).to.match(/\"nickname\" length must be at least 5 characters long/);
+      expect(res.body).to.haveOwnProperty('message');
+      expect(res.body.message).to.match(/\"nickname\" length must be at least 5 characters long/);
     });
 
 
@@ -67,8 +67,8 @@ describe('Auth integration tests', function() {
       const res = await exec();
 
       expect(res.status).to.equal(400);
-      expect(res.body).to.haveOwnProperty('error');
-      expect(res.body.error).to.match(/\"email\" must be a valid email/);
+      expect(res.body).to.haveOwnProperty('message');
+      expect(res.body.message).to.match(/\"email\" must be a valid email/);
     });
 
 
@@ -78,7 +78,7 @@ describe('Auth integration tests', function() {
       const res = await exec();
 
       expect(res.status).to.equal(400);
-      expect(res.body.error).to.match(/\"password\" length must be at least 5 characters long/);
+      expect(res.body.message).to.match(/\"password\" length must be at least 5 characters long/);
     });
 
 
@@ -127,7 +127,7 @@ describe('Auth integration tests', function() {
       const res = await exec();
 
       expect(res.status).to.equal(400);
-      expect(res.body.error).to.match(/invalid payload/);
+      expect(res.body.message).to.match(/invalid payload/);
     });
 
 
@@ -137,7 +137,7 @@ describe('Auth integration tests', function() {
       const res = await exec();
 
       expect(res.status).to.equal(401);
-      expect(res.body.error).to.match(/invalid login/);
+      expect(res.body.message).to.match(/invalid login/);
     });
 
 
@@ -147,8 +147,8 @@ describe('Auth integration tests', function() {
       const res = await exec();
 
       expect(res.status).to.equal(401);
-      expect(res.body).to.have.property('error');
-      expect(res.body.error).to.match(/invalid login/);
+      expect(res.body).to.have.property('message');
+      expect(res.body.message).to.match(/invalid login/);
     });
 
 
