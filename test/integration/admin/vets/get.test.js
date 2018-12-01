@@ -87,11 +87,6 @@ describe('ADMIN Vets GET routes', function() {
 
   // GET /vets/:slug
   describe('GET /vets/:slug', async () => {
-    beforeEach(() => {
-      vetHelper.populate();
-      token = admin.generateAuthToken();
-    });
-
     afterEach(() => {
       vetHelper.clear();
     });
@@ -99,11 +94,16 @@ describe('ADMIN Vets GET routes', function() {
     // retrieve one known slug from database
     let knownSlug;
     beforeEach(async () => {
+      vetHelper.populate();
+
       const vet = await new Vet({
         name: 'Random Vet Over Here',
-        address: 'Random Addres'
+        address: 'Random Addres',
+        googleId: 'aaa'
       }).save();
       knownSlug = vet.slug;
+
+      token = admin.generateAuthToken();
     });
 
     const exec = () => {

@@ -55,10 +55,7 @@ describe('ADMIN Vets POST routes', function() {
     let payload;
     beforeEach(() => {
       payload = {
-        position: {
-          type: 'Point',
-          coordinates: [ -39.123456, 39.654321 ]
-        },
+        googleId: 'a',
         name: 'A Newly Added Vet',
         address: '4914 St Random Street, V5T 1Z7 Vancouver, British Columbia, Canada',
         rodents: true,
@@ -85,22 +82,41 @@ describe('ADMIN Vets POST routes', function() {
     });
 
     // Position
-    it('should return 400 if position is invalid', async () => {
-      payload.position = [10000,20000];
+    // it('should return 400 if position is invalid', async () => {
+    //   payload.position = [10000,20000];
+
+    //   const res = await exec();
+
+    //   expect(res.status).to.equal(400);
+    //   expect(res.body.message).to.match(/invalid position/i);
+    // });
+
+    // it('should return 400 if position is missing', async () => {
+    //   payload.position = [];
+
+    //   const res = await exec();
+
+    //   expect(res.status).to.equal(400);
+    //   expect(res.body.message).to.match(/invalid position/i);
+    // });
+
+    // Name
+    it('should return 400 if Google Maps ID is missing', async () => {
+      delete payload.googleId;
 
       const res = await exec();
 
       expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid position/i);
+      expect(res.body.message).to.match(/invalid google id/i);
     });
-
-    it('should return 400 if position is missing', async () => {
-      payload.position = [];
+    
+    it('should return 400 if name is missing', async () => {
+      payload.name = '';
 
       const res = await exec();
 
       expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid position/i);
+      expect(res.body.message).to.match(/invalid name/i);
     });
 
     // Name

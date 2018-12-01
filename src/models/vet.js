@@ -3,11 +3,13 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 const slugs = require('mongoose-url-slugs');
 const { AssertionError } = require('../error-types');
-const { GeoSchema } = require('./geoschema');
+// const { GeoSchema } = require('./geoschema');
 
 const VetSchema = new mongoose.Schema({
-  position: GeoSchema,
-  googleId: String,
+  googleId: {
+    type: String,
+    required: true
+  },
   slug: String,
   name: {
     type: String,
@@ -44,14 +46,7 @@ const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9
 // Validation middleware
 function validateVet(payload) {
   const schema = {
-    position: Joi.object().keys({
-      type: Joi.string().optional(),
-      coordinates: Joi.array().items(
-        Joi.number().min(-90).max(90).required(),
-        Joi.number().min(-180).max(180).required()
-      )
-    }).error(new AssertionError('invalid position')),
-    googleId: Joi.string().error(new AssertionError('invalid google id')),
+    googleId: Joi.string().required().error(new AssertionError('invalid google id')),
     name: Joi.string().regex(nameRegex).required().error(new AssertionError('invalid name')),
     address: Joi.string().required().error(new AssertionError('invalid address')),
     rodents: Joi.boolean().error(new AssertionError('invalid rodents value')),

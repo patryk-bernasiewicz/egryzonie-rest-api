@@ -27,7 +27,7 @@ router.get('/:slug', async (req, res) => {
   const { slug } = req.params;
 
   const vet = await Vet
-    .findOne({ slug })
+    .findOne({ slug });
 
   if (!vet) {
     return res.sendStatus(404);

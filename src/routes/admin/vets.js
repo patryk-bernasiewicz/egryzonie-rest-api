@@ -5,7 +5,6 @@ const _ = require('lodash');
 const querymen = require('querymen');
 const { Vet, validateVet, vetUpdatableFields } = require(path.resolve('src/models/vet'));
 const adminGuard = require(path.resolve('src/middleware/admin-guard'));
-const error = require(path.resolve('src/helpers/error-helper'));
 
 const querySchema = new querymen.Schema({
   term: {
@@ -32,10 +31,11 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
 
 
 // GET /admin/vets/:slug
-router.get('/:slug', async (req, res) => {
+router.get('/:slug', async (req, res, next) => {
   const slug = req.params.slug || '';
   const vet = await Vet
-    .findOne({ slug });
+    .findOne({ slug })
+    .catch(next);
 
   if (!vet) {
     return res.status(404).json({ message: 'no vet found' });
@@ -46,7 +46,7 @@ router.get('/:slug', async (req, res) => {
 
 
 // POST /admin/vets
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   const payload = _.pick(req.body, vetUpdatableFields);
   
   const validate = validateVet(payload);
@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ message: validate.error.message });
   }
   
-  const vet = await Vet.create(payload);
+  const vet = await Vet.create(payload).catch(next);
   const location = '/admin/vets/' + vet.slug;
 
   return res.status(201).json({ vet, location });
@@ -62,7 +62,7 @@ router.post('/', async (req, res) => {
 
 
 // PUT /admin/vets/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
   const { id } = req.params;
   const payload = _.pick(req.body, vetUpdatableFields);
   
@@ -76,7 +76,8 @@ router.put('/:id', async (req, res) => {
   };
 
   const vet = await Vet
-    .findByIdAndUpdate(id, payload, options);
+    .findByIdAndUpdate(id, payload, options)
+    .catch(next);
 
   const location = '/admin/vets/' + vet.slug;
   
@@ -89,7 +90,8 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   const vet = await Vet
-    .findByIdAndRemove(id);
+    .findByIdAndRemove(id)
+    .catch(next);
 
   return res.json({ vet });
 });

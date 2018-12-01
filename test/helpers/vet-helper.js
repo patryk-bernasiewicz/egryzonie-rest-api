@@ -4,14 +4,14 @@ const async = require('async');
 const { Vet } = require(path.resolve('src/models/vet'));
 
 const vets = [
-  { name: 'Abc', address: '123 St.' },
-  { name: 'Def', address: '234 St.' },
-  { name: 'Ghi', address: '345 St.' },
-  { name: 'Jkl', address: '456 St.' },
-  { name: 'Mno', address: '567 St.' },
-  { name: 'Pqr', address: '678 St.' },
-  { name: 'Stu', address: '890 St.' },
-  { name: 'Zzz Caffee', address: 'Zzz St.' }
+  { name: 'Abc', address: '123 St.', googleId: 'a' },
+  { name: 'Def', address: '234 St.', googleId: 'a' },
+  { name: 'Ghi', address: '345 St.', googleId: 'a' },
+  { name: 'Jkl', address: '456 St.', googleId: 'a' },
+  { name: 'Mno', address: '567 St.', googleId: 'a' },
+  { name: 'Pqr', address: '678 St.', googleId: 'a' },
+  { name: 'Stu', address: '890 St.', googleId: 'a' },
+  { name: 'Zzz Caffee', address: 'Zzz St.', googleId: 'a' }
 ];
 
 class VetHelper {
@@ -46,7 +46,7 @@ class VetHelper {
 
   // private methods
   async _save(vet) {
-    const savedVet = await new Vet(vet).save().catch(err => console.error(err.message));
+    const savedVet = await new Vet(vet).save().catch(err => console.error('Cannot save vet with helper!', err.message));
     this.vets.push(savedVet);
   }
 }
