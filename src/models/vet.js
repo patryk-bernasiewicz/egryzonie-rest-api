@@ -19,11 +19,20 @@ const VetSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  rodents: Boolean,
-  exoticAnimals: Boolean,
+  rodents: {
+    type: Boolean,
+    default: false
+  },
+  exoticAnimals: {
+    type: Boolean,
+    default: false
+  },
   websiteUrl: String,
   phone: String,
-  accepted: Boolean,
+  accepted: {
+    type: Boolean,
+    default: false
+  },
   acceptedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -61,4 +70,4 @@ function validateVet(payload) {
 exports.Vet = Vet;
 exports.VetSchema = VetSchema;
 exports.validateVet = validateVet;
-exports.vetUpdatableFields = ['position', 'googleId', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone'];
+exports.vetUpdatableFields = ['googleId', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone'];

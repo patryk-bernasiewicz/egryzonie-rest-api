@@ -72,146 +72,145 @@ describe('ADMIN Vets POST routes', function() {
         .set('Authorization', `Bearer ${token}`);
     }
 
-    it('should return 401 if user is not an admin', async () => {
-      token = regularUser.generateAuthToken();
-
-      const res = await exec();
-
-      expect(res.status).to.equal(401);
-      expect(res.body.message).to.match(/unauthorized/i);
+    describe('Authentication', () => {
+      it('should return 401 if user is not an admin', async () => {
+        token = regularUser.generateAuthToken();
+  
+        const res = await exec();
+  
+        expect(res.status).to.equal(401);
+        expect(res.body.message).to.match(/unauthorized/i);
+      });
     });
 
-    // Position
-    // it('should return 400 if position is invalid', async () => {
-    //   payload.position = [10000,20000];
+    describe('Invalid payload', () => {
 
-    //   const res = await exec();
+      // Name
+      it('should return 400 if Google Maps ID is missing', async () => {
+        delete payload.googleId;
 
-    //   expect(res.status).to.equal(400);
-    //   expect(res.body.message).to.match(/invalid position/i);
-    // });
+        const res = await exec();
 
-    // it('should return 400 if position is missing', async () => {
-    //   payload.position = [];
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid google id/i);
+      });
+      
+      it('should return 400 if name is missing', async () => {
+        payload.name = '';
 
-    //   const res = await exec();
+        const res = await exec();
 
-    //   expect(res.status).to.equal(400);
-    //   expect(res.body.message).to.match(/invalid position/i);
-    // });
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid name/i);
+      });
 
-    // Name
-    it('should return 400 if Google Maps ID is missing', async () => {
-      delete payload.googleId;
+      // Name
+      it('should return 400 if name is invalid', async () => {
+        payload.name = '#Some Invalid #!@#!@# Name   ';
 
-      const res = await exec();
+        const res = await exec();
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid google id/i);
-    });
-    
-    it('should return 400 if name is missing', async () => {
-      payload.name = '';
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid name/i);
+      });
+      
+      it('should return 400 if name is missing', async () => {
+        payload.name = '';
 
-      const res = await exec();
+        const res = await exec();
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid name/i);
-    });
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid name/i);
+      });
 
-    // Name
-    it('should return 400 if name is invalid', async () => {
-      payload.name = '#Some Invalid #!@#!@# Name   ';
+      // Address
+      it('should return 400 if address is missing', async () => {
+        payload.address = '';
 
-      const res = await exec();
+        const res = await exec();
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid name/i);
-    });
-    
-    it('should return 400 if name is missing', async () => {
-      payload.name = '';
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid address/i);
+      });
 
-      const res = await exec();
+      // Rodents
+      it('should return 400 if rodents value is invalid', async () => {
+        payload.rodents = 'string, not a boolean';
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid name/i);
-    });
+        const res = await exec();
 
-    // Address
-    it('should return 400 if address is missing', async () => {
-      payload.address = '';
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid rodents value/i);
+      });
 
-      const res = await exec();
+      it('should return 400 if rodents value is missing', async () => {
+        payload.rodents = null;
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid address/i);
-    });
+        const res = await exec();
 
-    // Rodents
-    it('should return 400 if rodents value is invalid', async () => {
-      payload.rodents = 'string, not a boolean';
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid rodents value/i);
+      });
 
-      const res = await exec();
+      // Exotic animals
+      it('should return 400 if exotic animals is invalid', async () => {
+        payload.exoticAnimals = 'string, not a boolean';
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid rodents value/i);
-    });
+        const res = await exec();
 
-    it('should return 400 if rodents value is missing', async () => {
-      payload.rodents = null;
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid exotic animals value/i);
+      });
 
-      const res = await exec();
+      it('should return 400 if exotic animals is missing', async () => {
+        payload.exoticAnimals = null;
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid rodents value/i);
-    });
+        const res = await exec();
 
-    // Exotic animals
-    it('should return 400 if exotic animals is invalid', async () => {
-      payload.exoticAnimals = 'string, not a boolean';
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid exotic animals value/i);
+      });
 
-      const res = await exec();
+      // Website URL
+      it('should return 400 if website URL is invalid', async () => {
+        // payload.websiteUrl = 'htp://adfasdfasdf';
+        payload.websiteUrl = true;
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid exotic animals value/i);
-    });
+        const res = await exec();
 
-    it('should return 400 if exotic animals is missing', async () => {
-      payload.exoticAnimals = null;
-
-      const res = await exec();
-
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid exotic animals value/i);
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid website url/i);
+      });
     });
 
-    // Website URL
-    it('should return 400 if website URL is invalid', async () => {
-      // payload.websiteUrl = 'htp://adfasdfasdf';
-      payload.websiteUrl = true;
+    describe('Valid payload', () => {
+      it('should return 201 and create new Vet', async () => {
+        const res = await exec();
 
-      const res = await exec();
+        expect(res.status).to.equal(201);
+        expect(res.body).to.have.property('vet');
+        expect(res.body.vet).to.be.an('object');
+        expect(res.body).to.have.property('location');
+        expect(res.body.location).to.match(new RegExp('\/admin\/vets\/a-newly-added-vet', 'i'));
 
-      expect(res.status).to.equal(400);
-      expect(res.body.message).to.match(/invalid website url/i);
-    });
+        const foundVet = await Vet.findOne({ name: payload.name }).populate('acceptedBy', '_id nickname');
+        expect(foundVet).to.not.be.null;
+        expect(foundVet).to.have.property('name');
+        expect(foundVet.name).to.equal(payload.name);
+        expect(foundVet.name).to.equal(res.body.vet.name);
 
-    // valid payload
-    it('should return 201 and create new Vet', async () => {
-      const res = await exec();
-
-      expect(res.status).to.equal(201);
-      expect(res.body).to.have.property('vet');
-      expect(res.body.vet).to.be.an('object');
-      expect(res.body).to.have.property('location');
-      expect(res.body.location).to.match(new RegExp('\/admin\/vets\/a-newly-added-vet', 'i'));
-
-      const foundVet = await Vet.findOne({ name: payload.name });
-      expect(foundVet).to.not.be.null;
-      expect(foundVet).to.have.property('name');
-      expect(foundVet.name).to.equal(payload.name);
-      expect(foundVet.name).to.equal(res.body.vet.name);
+        // default values
+        expect(foundVet).to.have.property('rodents');
+        expect(foundVet).to.have.property('exoticAnimals');
+        expect(foundVet).to.have.property('accepted');
+        expect(foundVet).to.have.property('acceptedDate');
+        expect(foundVet).to.have.property('acceptedBy');
+        expect(foundVet.rodents).to.equal(true);
+        expect(foundVet.exoticAnimals).to.equal(true);
+        expect(foundVet.accepted).to.equal(true);
+        expect(foundVet.acceptedDate).to.be.a('date');
+        expect(foundVet.acceptedBy).to.be.an('object');
+      });
     });
 
   });

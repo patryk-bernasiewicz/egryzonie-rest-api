@@ -33,7 +33,7 @@ router.get('/:slug', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  return res.status(200).json({ vet });
+  return res.status(200).json(vet);
 });
 
 module.exports = router;

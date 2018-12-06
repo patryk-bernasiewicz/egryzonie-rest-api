@@ -54,6 +54,12 @@ router.post('/', async (req, res, next) => {
     return res.status(400).json({ message: validate.error.message });
   }
   
+  if (!payload.accepted) {
+    payload.accepted = true;
+    payload.acceptedDate = new Date;
+    payload.acceptedBy = req.user._id;
+  }
+
   const vet = await Vet.create(payload).catch(next);
   const location = '/admin/vets/' + vet.slug;
 

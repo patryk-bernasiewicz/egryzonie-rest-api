@@ -131,9 +131,8 @@ describe('FRONT Vets GET routes', function() {
 
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an('object');
-      expect(res.body).to.have.property('vet');
-      expect(res.body.vet).have.property('name');
-      expect(res.body.vet.name).to.equal(vetHelper.vets[0].name);
+      expect(res.body).have.property('name');
+      expect(res.body.name).to.equal(vetHelper.vets[0].name);
     });
   });
 });
