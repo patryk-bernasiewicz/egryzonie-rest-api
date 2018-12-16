@@ -77,10 +77,17 @@ describe('ADMIN Vets GET routes', function() {
       const res = await exec();
 
       expect(res.status).to.equal(200);
-      expect(res.body).to.be.an('array');
-      expect(res.body.length).to.equal(vetHelper.vets.length);
-      expect(res.body[0]).to.be.an('object');
-      expect(res.body[0]).to.haveOwnProperty('name');
+      expect(res.body).to.be.an('object');
+
+      expect(res.body).to.have.property('total');
+      expect(res.body.total).to.be.a('number');
+      expect(res.body.total).to.equal(vetHelper.vets.length);
+
+      expect(res.body).to.have.property('vets');
+      expect(res.body.vets).to.be.an('array');
+      expect(res.body.vets.length).to.equal(vetHelper.vets.length);
+      expect(res.body.vets[0]).to.be.an('object');
+      expect(res.body.vets[0]).to.haveOwnProperty('name');
     });
   });
 
@@ -137,6 +144,8 @@ describe('ADMIN Vets GET routes', function() {
 
     it('should return 200 when valid slug is provided', async () => {
       const res = await exec();
+
+      expect(res.body).to.be.an('object');
 
       expect(res.status).to.equal(200);
     });

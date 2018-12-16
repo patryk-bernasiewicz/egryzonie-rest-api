@@ -20,13 +20,15 @@ router.use('/', adminGuard);
 
 // GET /admin/vets
 router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor: { skip, limit }, sort } }, res) => {
+  const count = await Vet.count();
+
   const vets = await Vet
     .find(search)
     .skip(skip)
     .limit(limit)
     .sort(sort);
 
-  return res.status(200).json(vets);
+  return res.status(200).json({ total: count, vets });
 });
 
 

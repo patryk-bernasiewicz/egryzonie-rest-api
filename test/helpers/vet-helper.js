@@ -4,14 +4,14 @@ const async = require('async');
 const { Vet } = require(path.resolve('src/models/vet'));
 
 const vets = [
-  { name: 'Abc', address: '123 St.', googleId: 'a' },
-  { name: 'Def', address: '234 St.', googleId: 'a' },
-  { name: 'Ghi', address: '345 St.', googleId: 'a' },
-  { name: 'Jkl', address: '456 St.', googleId: 'a' },
-  { name: 'Mno', address: '567 St.', googleId: 'a' },
-  { name: 'Pqr', address: '678 St.', googleId: 'a' },
-  { name: 'Stu', address: '890 St.', googleId: 'a' },
-  { name: 'Zzz Caffee', address: 'Zzz St.', googleId: 'a' }
+  { name: 'Abc', address: '123 St.', googleId: 'a', accepted: true },
+  { name: 'Def', address: '234 St.', googleId: 'a', accepted: true },
+  { name: 'Ghi', address: '345 St.', googleId: 'a', accepted: true },
+  { name: 'Jkl', address: '456 St.', googleId: 'a', accepted: true },
+  { name: 'Mno', address: '567 St.', googleId: 'a', accepted: true },
+  { name: 'Pqr', address: '678 St.', googleId: 'a', accepted: true },
+  { name: 'Stu', address: '890 St.', googleId: 'a', accepted: true },
+  { name: 'Zzz Caffee', address: 'Zzz St.', googleId: 'a', accepted: true }
 ];
 
 class VetHelper {
