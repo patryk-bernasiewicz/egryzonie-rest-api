@@ -20,13 +20,8 @@ class VetHelper {
   }
 
   async populate() {
-    return new Promise((resolve, reject) => {
-      async.each(vets, this._save.bind(this), err => {
-        if (err) reject(err);
-        this.vets.sort((a, b) => a.name > b.name);
-        resolve(this.vets);
-      });
-    });
+    await this._saveVets();
+    return await Vet.find({});
   }
   
   async createOne() {
@@ -44,10 +39,11 @@ class VetHelper {
       .catch(err => console.error(err.message));
   }
 
-  // private methods
-  async _save(vet) {
-    const savedVet = await new Vet(vet).save().catch(err => console.error('Cannot save vet with helper!', err.message));
-    this.vets.push(savedVet);
+  async _saveVets() {
+    return vets.reduce(async (previousPromise, nextVet) => {
+      await previousPromise;
+      return new Vet(nextVet).save();
+    }, Promise.resolve());
   }
 }
 
