@@ -6,26 +6,29 @@ const querymen = require('querymen');
 const { Vet, validateVet, vetUpdatableFields } = require(path.resolve('src/models/vet'));
 const adminGuard = require(path.resolve('src/middleware/admin-guard'));
 
-const querySchema = new querymen.Schema({
+const querySchema = {
   term: {
     type: RegExp,
     paths: ['name', 'address'],
     bindTo: 'search'
   }
-});
+};
 
 router.use('/', passport.authenticate('jwt', { session: false }));
 router.use('/', adminGuard);
 
 
 // GET /admin/vets
-router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor: { skip, limit }, sort } }, res) => {
+router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor, sort } }, res) => {
   const count = await Vet.count();
+
+  // TODO:
+  // 1. continue tests with test/integration/admin/vets/get.test.js
 
   const vets = await Vet
     .find(search)
-    .skip(skip)
-    .limit(limit)
+    .skip(cursor.skip)
+    .limit(cursor.limit)
     .sort(sort);
 
   return res.status(200).json({ total: count, vets });

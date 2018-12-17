@@ -26,6 +26,7 @@ describe('ADMIN Vets GET routes', function() {
   let token;
   let admin;
   let regularUser;
+  let vets;
 
   before(async () => {
     testHelper.startDb();
@@ -50,7 +51,7 @@ describe('ADMIN Vets GET routes', function() {
 
 
   beforeEach(async () => {
-    await vetHelper.populate();
+    vets = await vetHelper.populate();
     token = admin.generateAuthToken();
   });
 
@@ -88,6 +89,36 @@ describe('ADMIN Vets GET routes', function() {
       expect(res.body.vets.length).to.equal(vetHelper.vets.length);
       expect(res.body.vets[0]).to.be.an('object');
       expect(res.body.vets[0]).to.haveOwnProperty('name');
+    });
+  });
+
+  describe('GET /vets with pagination', async () => {
+
+    const exec = (page) => {
+      const perPage = 1;
+      return request(server)
+        .get(`/admin/vets?page=${page}&limit=${perPage}`)
+        .set('Authorization', `Bearer ${token}`);
+    };
+
+    it('should return 401 if user is not an admin', async () => {
+      token = regularUser.generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).to.equal(401);
+      expect(res.body.message).to.match(/unauthorized/);
+    });
+
+    it('should return 200 and return list of vets', async () => {
+      const all = await Promise.all([ exec(1), exec(2) ]);
+
+      for (let res of all) {
+        expect(res.status).to.equal(200);
+        expect(res.body).to.have.property('total');
+        expect(res.body.total).to.be.a('number');
+        expect(res.body.total).to.equal(vets.length);
+      };
     });
   });
 
