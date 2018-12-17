@@ -19,8 +19,8 @@ router.use('/', adminGuard);
 
 
 // GET /admin/vets
-router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor, sort } }, res) => {
-  const count = await Vet.count();
+router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor, sort } }, res, next) => {
+  const count = await Vet.count().catch(next);
 
   // TODO:
   // 1. continue tests with test/integration/admin/vets/get.test.js
@@ -29,7 +29,8 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
     .find(search)
     .skip(cursor.skip)
     .limit(cursor.limit)
-    .sort(sort);
+    .sort(sort)
+    .catch(next);
 
   return res.status(200).json({ total: count, vets });
 });
@@ -97,7 +98,7 @@ router.put('/:id', async (req, res, next) => {
 
 
 // DELETE /admin/vets/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
   const { id } = req.params;
 
   const vet = await Vet
