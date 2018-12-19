@@ -1,4 +1,5 @@
 node_modules
 coverage
+cert/**
 **/*.log
 .nyc_output

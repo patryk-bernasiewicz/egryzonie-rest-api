@@ -19,11 +19,14 @@ router.use('/', adminGuard);
 
 
 // GET /admin/vets
+
 router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor, sort } }, res, next) => {
   const count = await Vet.count().catch(next);
 
   // TODO:
   // 1. continue tests with test/integration/admin/vets/get.test.js
+
+  console.log(cursor);
 
   const vets = await Vet
     .find(search)

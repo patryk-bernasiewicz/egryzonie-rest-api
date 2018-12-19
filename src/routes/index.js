@@ -20,7 +20,7 @@ router.use('/vets', vets);
 router.use('/admin', admin);
 
 // Error Handling Middleware
-router.use((err, req, res) => {
+router.use(function(err, req, res, next) {
   logger.error(`${err.message}\n\n${err.stack}\n\n`);
 
   if (process.env.NODE_ENV !== 'development') {
