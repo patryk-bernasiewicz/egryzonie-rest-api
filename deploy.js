@@ -1,4 +1,3 @@
-const path = require('path');
 const FtpDeploy = require('ftp-deploy');
 const ftpDeploy = new FtpDeploy();
 const readline = require('readline');
@@ -13,10 +12,23 @@ if (targetArg) {
   target = 'production';
 }
 
+const silent = process.argv.find(arg => arg.match(/--silent/));
+
+function write(text = '\n', oneLine = false, force = false) {
+  if (oneLine) {
+    readline.clearLine(process.stdout, 0);
+    readline.cursorTo(process.stdout, 0, null);
+  }
+  if (!silent || force) {
+    process.stdout.write(text);
+  }
+}
+
+
 const config = require('./deploy/config');
 
 if (!config[target]) {
-  process.stdout.write(`No config specified for target "${target}"!\n`);
+  write(`No config specified for target "${target}"!\n`);
   process.kill(0);
 }
 
@@ -36,20 +48,18 @@ const ftpDeployConfig = {
 
 ftpDeploy.on('uploaded', function({ totalFilesCount, transferredFileCount }) {
   const percent = Math.ceil((transferredFileCount / totalFilesCount) * 100);
-  readline.clearLine(process.stdout, 0);
-  readline.cursorTo(process.stdout, 0, null);
-  process.stdout.write(`Uploaded files... ${transferredFileCount}/${totalFilesCount} (${percent}%)`);
+  write(`Uploaded files... ${transferredFileCount}/${totalFilesCount} (${percent}%)`, true);
 });
 ftpDeploy.on('log', function(data) {
-  process.stdout.write(`[LOG] ${data}`);
+  write(`[LOG] ${data}`);
 });
 
 
 (async () => {
-  process.stdout.write(`Preparing to upload files to ${useConfig.ftp.server}...\n`);
+  write(`Preparing to upload files to ${useConfig.ftp.server}...\n`);
   await ftpDeploy.deploy(ftpDeployConfig)
-    .catch(error => process.stdout.write(error.message));
-  process.stdout.write('\nSuccessfully deployed all filed to FTP!\n');
+    .catch(error => write(error.message));
+  write('\nSuccessfully deployed all filed to FTP!\n');
   
   const sshConnection = new nodeSSH();
 
@@ -58,14 +68,14 @@ ftpDeploy.on('log', function(data) {
     username: useConfig.ssh.username,
     privateKey: useConfig.ssh.privateKey,
     passphrase: useConfig.ssh.password
-  }).catch(error => process.stdout.write(error.message));
-  process.stdout.write(`Successfully connected to ${useConfig.ssh.host} via SSH.\n`);
+  }).catch(error => write(error.message));
+  write(`Successfully connected to ${useConfig.ssh.host} via SSH.\n`);
   for (let command of useConfig.ssh.commands) {
-    process.stdout.write(`Executing command '${command}'... \n`);
+    write(`Executing command '${command}'... \n`);
     const result = await sshConnection.execCommand(command, { cwd: useConfig.ssh.cwd }).catch(error => process.stdout.write('[SSH] Error!', error));
-    process.stdout.write(result.stdout.toString('utf8') + '\n');
+    write(result.stdout.toString('utf8') + '\n');
   }
   sshConnection.dispose();
 
-  process.stdout.write('\nEverything went smoothly!\n');
+  write('\nEverything went smoothly!\n', false, true);
 })();
