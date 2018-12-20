@@ -15,11 +15,11 @@ if (targetArg) {
 const silent = process.argv.find(arg => arg.match(/--silent/));
 
 function write(text = '\n', oneLine = false, force = false) {
-  if (oneLine) {
-    readline.clearLine(process.stdout, 0);
-    readline.cursorTo(process.stdout, 0, null);
-  }
   if (!silent || force) {
+    if (oneLine) {
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0, null);
+    }
     process.stdout.write(text);
   }
 }
@@ -42,13 +42,13 @@ const ftpDeployConfig = {
   localRoot: __dirname,
   remoteRoot: useConfig.ftp.directory,
   include: ['*.js', '*.json', 'config/**/*.json', 'startup/**/*.js', 'src/**/*.js'],
-  exclude: ['node_modules/**/*', 'test/**/*', 'coverage/**/*', '.nyc_output', 'cert/**/*'],
+  exclude: ['node_modules/**/*', 'node_modules/faker/**/*', 'deploy/**/*', 'test/**/*', 'coverage/**/*', '.nyc_output', 'cert/**/*', 'node_modules/**/*'],
   forcePasv: false
 };
 
-ftpDeploy.on('uploaded', function({ totalFilesCount, transferredFileCount }) {
+ftpDeploy.on('uploaded', function({ totalFilesCount, transferredFileCount, filename }) {
   const percent = Math.ceil((transferredFileCount / totalFilesCount) * 100);
-  write(`Uploaded files... ${transferredFileCount}/${totalFilesCount} (${percent}%)`, true);
+  write(`Uploading files... ${transferredFileCount}/${totalFilesCount} (${percent}%) ${filename}`, true, true);
 });
 ftpDeploy.on('log', function(data) {
   write(`[LOG] ${data}`);
@@ -56,7 +56,7 @@ ftpDeploy.on('log', function(data) {
 
 
 (async () => {
-  write(`Preparing to upload files to ${useConfig.ftp.server}...\n`);
+  write(`Preparing to upload files to ${useConfig.targetName}...\n`);
   await ftpDeploy.deploy(ftpDeployConfig)
     .catch(error => write(error.message));
   write('\nSuccessfully deployed all filed to FTP!\n');

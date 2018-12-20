@@ -7,6 +7,8 @@ const app = express();
 
 const origin = config.get('allowedOrigins').split(';') || ['http://localhost:4200', 'http://localhost:4000'];
 
+// this is a checking comment
+
 app.use(cors({
   origin,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
