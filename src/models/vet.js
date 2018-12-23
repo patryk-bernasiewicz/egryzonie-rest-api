@@ -61,7 +61,8 @@ function validateVet(payload) {
     rodents: Joi.boolean().error(new AssertionError('invalid rodents value')),
     exoticAnimals: Joi.boolean().error(new AssertionError('invalid exotic animals value')),
     websiteUrl: Joi.string().regex(urlRegex).error(new AssertionError('invalid website url')),
-    phone: Joi.string().error(new AssertionError('invalid phone number'))
+    phone: Joi.string().error(new AssertionError('invalid phone number')),
+    accepted: Joi.boolean().error(new AssertionError('invalid accepted value'))
   };
 
   return Joi.validate(payload, schema);
@@ -70,4 +71,4 @@ function validateVet(payload) {
 exports.Vet = Vet;
 exports.VetSchema = VetSchema;
 exports.validateVet = validateVet;
-exports.vetUpdatableFields = ['googleId', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone'];
+exports.vetUpdatableFields = ['googleId', 'name', 'address', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone', 'accepted'];

@@ -44,8 +44,8 @@ class AuthHelper {
   }
 
   async clear() {
-    await User.remove({});
-    await Agreement.remove({});
+    await User.deleteMany({});
+    await Agreement.deleteMany({});
   }
 }
 

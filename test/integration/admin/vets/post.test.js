@@ -181,6 +181,16 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.status).to.equal(400);
         expect(res.body.message).to.match(/invalid website url/i);
       });
+
+      // Accepted
+      it('should return 400 if accepted has invalid value', async () => {
+        payload.accepted = 'stringush';
+
+        const res = await exec();
+
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.match(/invalid accepted value/i);
+      });
     });
 
     describe('Valid payload', () => {

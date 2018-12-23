@@ -11,7 +11,7 @@ let smallPayload;
 describe('Vet Model', () => {
   beforeEach(() => {
     payload = {
-      position: { type: 'Point', coordinates: [ -69.12345, -55.54321 ] },
+      googleId: 'aaaa',
       name: 'Centrum Zdrowia Małych Zwierząt',
       address: 'Wronki, ul. Poznańska 39',
       rodents: true,
@@ -57,15 +57,16 @@ describe('Vet Model', () => {
       });
   
   
-      it('should reject invalid coordinates', () => {
-        payload.position = {
-          type: 'Point',
-          coordinates: [ 199, 500 ]
-        };
+      // we don't use position anymore
+      // it('should reject invalid coordinates', () => {
+      //   payload.position = {
+      //     type: 'Point',
+      //     coordinates: [ 199, 500 ]
+      //   };
   
-        const { error } = exec(payload);
-        expect(error.message).to.match(/invalid position/i);
-      });
+      //   const { error } = exec(payload);
+      //   expect(error.message).to.match(/invalid position/i);
+      // });
   
   
       it('should reject invalid address', () => {

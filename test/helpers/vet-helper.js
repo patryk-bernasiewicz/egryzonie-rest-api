@@ -35,7 +35,7 @@ class VetHelper {
       .deleteMany({})
       .catch(err => console.error(err.message));
     await mongoose.connection.db.collection('_slug_ctrs')
-      .remove({})
+      .deleteMany({})
       .catch(err => console.error(err.message));
   }
 

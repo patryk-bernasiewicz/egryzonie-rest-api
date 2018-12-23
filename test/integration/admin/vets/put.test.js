@@ -197,6 +197,16 @@ describe('ADMIN Vets PUT routes', function() {
       expect(res.body.message).to.match(/invalid website url/i);
     });
 
+    // Accepted
+    it('should return 400 if accepted has invalid value', async () => {
+      payload.accepted = 'stringush';
+
+      const res = await exec();
+
+      expect(res.status).to.equal(400);
+      expect(res.body.message).to.match(/invalid accepted value/i);
+    });
+
     it('gets the Vet updated and returns it', async () => {
       expect(2+2).to.equal(4);
       

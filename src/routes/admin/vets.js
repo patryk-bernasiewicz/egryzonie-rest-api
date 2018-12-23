@@ -91,7 +91,7 @@ router.put('/:id', async (req, res, next) => {
   };
 
   const vet = await Vet
-    .findByIdAndUpdate(id, payload, options)
+    .findOneAndUpdate({ _id: id }, payload, options)
     .catch(next);
 
   const location = '/admin/vets/' + vet.slug;
