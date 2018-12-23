@@ -2,25 +2,36 @@ const path = require('path');
 const router = require('express').Router();
 const passport = require('passport');
 const { User, validateUser } = require(path.resolve('src/models/user'));
+const { Agreement } = require(path.resolve('src/models/agreement'));
 const _ = require('lodash');
 
 // POST /auth/signup
 router.post('/signup', async (req, res) => {
-  const validate = validateUser(req.body);
+  const userPayload = _.pick(req.body, ['nickname', 'email', 'password']);
+
+  const validate = validateUser(userPayload);
   if (validate.error) return res.status(400).json({ message: validate.error.details[0].message });
 
-  const { nickname, email, password } = req.body;
+  if (!req.body.signupAgreement) {
+    return res.status(400).json({ message: '"signupAgreement" must be checked' });
+  }
 
   const existingUser = await User
-    .findOne({ email }, 'username role');
+    .findOne({ email: userPayload.email }, 'username role');
   if (existingUser) {
     return res.status(400).json({ message: 'user exists' });
   }
 
   const newUser = await User
-    .create({ nickname, email, password });
+    .create(userPayload);
   if (!newUser) {
     throw new Error('Something went terribly wrong!');
+  }
+
+  const agreement = await Agreement
+    .create({ agreement: 'signup', user: newUser });
+  if (!agreement) {
+    throw new Error('Could not save the Agreement.');
   }
 
   const token = newUser.generateAuthToken();

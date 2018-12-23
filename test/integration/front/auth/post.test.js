@@ -82,6 +82,16 @@ describe('Auth integration tests', function() {
     });
 
 
+    it('should return 400 if agreement is not checked', async () => {
+      payload.signupAgreement = false;
+
+      const res = await exec();
+
+      expect(res.status).to.equal(400);
+      expect(res.body.message).to.match(/\"signupAgreement\" must be checked/);
+    });
+
+
     it('should return 201 and a jwt token if payload is valid', async () => {
       const res = await exec();
 
