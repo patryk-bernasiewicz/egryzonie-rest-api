@@ -54,6 +54,22 @@ router.get('/:slug', async (req, res, next) => {
 });
 
 
+// POST /admin/vets/import
+router.post('/import', async (req, res, next) => {
+  if (!Array.isArray(req.body)) {
+    return res.status(400).json({ message: 'import expects an array of Vets' });
+  }
+
+  const vets = req.body
+    .filter(vet => !!vet.name && !!vet.address && !!vet.googleId)
+    .map(vet => _.pick(vet, ['name', 'address', 'googleId', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone']));
+
+  const insert = await Vet.collection.insert(vets).catch(next);
+
+  return res.status(201).json({ amount: insert.insertedCount });
+});
+
+
 // POST /admin/vets
 router.post('/', async (req, res, next) => {
   const payload = _.pick(req.body, vetUpdatableFields);
@@ -110,5 +126,6 @@ router.delete('/:id', async (req, res, next) => {
 
   return res.json({ vet });
 });
+
 
 module.exports = router;
