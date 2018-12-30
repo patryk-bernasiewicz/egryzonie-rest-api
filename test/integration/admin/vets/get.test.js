@@ -55,7 +55,7 @@ describe('ADMIN Vets GET routes', function() {
     token = admin.generateAuthToken();
   });
 
-/*
+
   // GET /admin/vets
   describe('GET /vets', async () => {
 
@@ -82,16 +82,17 @@ describe('ADMIN Vets GET routes', function() {
 
       expect(res.body).to.have.property('total');
       expect(res.body.total).to.be.a('number');
-      expect(res.body.total).to.equal(vetHelper.vets.length);
+      expect(res.body.total).to.equal(vetHelper.payload.length);
 
       expect(res.body).to.have.property('vets');
       expect(res.body.vets).to.be.an('array');
-      expect(res.body.vets.length).to.equal(vetHelper.vets.length);
+      expect(res.body.vets.length).to.equal(vetHelper.payload.length);
       expect(res.body.vets[0]).to.be.an('object');
       expect(res.body.vets[0]).to.haveOwnProperty('name');
     });
   });
-*/
+
+
   describe('GET /vets with pagination', async () => {
 
     const exec = (page) => {
@@ -125,8 +126,8 @@ describe('ADMIN Vets GET routes', function() {
     });
   });
 
-/*
-  // GET /vets/:slug
+
+  // GET /admin/vets/:slug
   describe('GET /vets/:slug', async () => {
     afterEach(() => {
       vetHelper.clear();
@@ -184,5 +185,38 @@ describe('ADMIN Vets GET routes', function() {
       expect(res.status).to.equal(200);
     });
   });
-*/
+
+
+  // GET /admin/vets/export
+  describe('GET /admin/vets/export', () => {
+
+    const exec = () => {
+      return request(server)
+        .get('/admin/vets/export')
+        .set('Authorization', `Bearer ${token}`);
+    };
+
+    it('should return 401 if user is not an admin', async () => {
+      const regularUser = await new User({
+        nickname: 'RegularUser',
+        email: 'regular@user.net',
+        password: 'RegularUserPassword'
+      }).save();
+      token = regularUser.generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).to.equal(401);
+      expect(res.body.message).to.match(/unauthorized/);
+    });
+
+    it('should return 200 and CSV type response', async () => {
+      const res = await exec();
+
+      expect(res.type).to.equal('text');
+      expect(res.message).to.be.undefined;
+      expect(res.status).to.equal(200);
+    });
+
+  });
 });

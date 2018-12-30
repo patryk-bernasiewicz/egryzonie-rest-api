@@ -38,7 +38,7 @@ class VetHelper {
   }
 
   async _saveVets() {
-    return this.vets.reduce(async (previousPromise, nextVet) => {
+    return this.payload.reduce(async (previousPromise, nextVet) => {
       await previousPromise;
       return new Vet(nextVet).save();
     }, Promise.resolve());

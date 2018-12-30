@@ -5,6 +5,7 @@ const _ = require('lodash');
 const querymen = require('querymen');
 const { Vet, validateVet, vetUpdatableFields } = require(path.resolve('src/models/vet'));
 const adminGuard = require(path.resolve('src/middleware/admin-guard'));
+const Json2CSVParser = require('json2csv').Parser;
 
 const querySchema = {
   term: {
@@ -19,14 +20,8 @@ router.use('/', adminGuard);
 
 
 // GET /admin/vets
-
 router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, cursor, sort } }, res, next) => {
   const count = await Vet.count().catch(next);
-
-  // TODO:
-  // 1. continue tests with test/integration/admin/vets/get.test.js
-
-  console.log(cursor);
 
   const vets = await Vet
     .find(search)
@@ -36,6 +31,33 @@ router.get('/', querymen.middleware(querySchema), async ({ querymen: { search, c
     .catch(next);
 
   return res.status(200).json({ total: count, vets });
+});
+
+
+// GET /admin/vets/export
+router.get('/export', async (req, res, next) => {
+  let vets = await Vet.find({}).catch(next);
+
+  const fields = [
+    { label: 'Nazwa', value: 'name' },
+    { label: 'Adres', value: 'address' },
+    { label: 'Google Place ID', value: 'googleId' },
+    { label: 'Gryzonie', value: 'rodents' },
+    { label: 'Zwierzęta egzotyczne', value: 'exoticAnimals' },
+    { label: 'WWW', value: 'websiteUrl' },
+    { label: 'Telefon', value: 'phone' }
+  ];
+
+  const parser = new Json2CSVParser({ fields });
+  const csv = parser.parse(vets);
+  
+  const filename = `placowki-weterynaryjne-${Date.now()}.csv`;
+
+  return res
+    .set('Content-Type', 'text/csv')
+    .set('Content-Disposition', `attachment; filename="placowki-weterynaryjne-${filename}.csv"`)
+    .status(200)
+    .send(csv);
 });
 
 

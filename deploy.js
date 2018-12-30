@@ -48,7 +48,7 @@ const ftpDeployConfig = {
 
 ftpDeploy.on('uploaded', function({ totalFilesCount, transferredFileCount, filename }) {
   const percent = Math.ceil((transferredFileCount / totalFilesCount) * 100);
-  write(`Uploading files... ${transferredFileCount}/${totalFilesCount} (${percent}%) ${filename}`, true, true);
+  write(`Uploading files... ${transferredFileCount}/${totalFilesCount} (${percent}%) ${filename}\n`, false, true);
 });
 ftpDeploy.on('log', function(data) {
   write(`[LOG] ${data}`);

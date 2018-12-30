@@ -28,6 +28,7 @@
     "joi": "^14.0.4",
     "joi-objectid": "^2.0.0",
     "joi-password-complexity": "^2.0.1",
+    "json2csv": "^4.3.2",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "mocha-logger": "^1.0.6",
