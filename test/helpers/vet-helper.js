@@ -5,14 +5,14 @@ const { Vet } = require(path.resolve('src/models/vet'));
 class VetHelper {
   constructor() {
     this.payload = [
-      { name: 'Abc', address: '123 St.', googleId: 'a', accepted: true },
-      { name: 'Def', address: '234 St.', googleId: 'a', accepted: true },
-      { name: 'Ghi', address: '345 St.', googleId: 'a', accepted: true },
-      { name: 'Jkl', address: '456 St.', googleId: 'a', accepted: true },
-      { name: 'Mno', address: '567 St.', googleId: 'a', accepted: true },
-      { name: 'Pqr', address: '678 St.', googleId: 'a', accepted: true },
-      { name: 'Stu', address: '890 St.', googleId: 'a', accepted: true },
-      { name: 'Zzz Caffee', address: 'Zzz St.', googleId: 'a', accepted: true }
+      { name: 'Abc', address: '123 St.', googleId: 'abc', accepted: true },
+      { name: 'Def', address: '234 St.', googleId: 'def', accepted: true },
+      { name: 'Ghi', address: '345 St.', googleId: 'ghi', accepted: true },
+      { name: 'Jkl', address: '456 St.', googleId: 'jkl', accepted: true },
+      { name: 'Mno', address: '567 St.', googleId: 'mno', accepted: true },
+      { name: 'Pqr', address: '678 St.', googleId: 'pqr', accepted: true },
+      { name: 'Stu', address: '890 St.', googleId: 'stu', accepted: true },
+      { name: 'Zzz Caffee', address: 'Zzz St.', googleId: 'zzz', accepted: true }
     ];
     this.vets = [];
   }

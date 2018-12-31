@@ -276,6 +276,9 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.body).to.have.property('amount');
         expect(res.body.amount).to.be.a('number');
         expect(res.body.amount).to.equal(vetHelper.payload.length - 1);
+        expect(res.body).to.have.property('vets');
+        expect(res.body.vets).to.be.an('array');
+        expect(res.body.vets.length).to.equal(payload.length - 1);
       });
     });
 
@@ -287,10 +290,17 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.status).to.equal(201);
         expect(res.body).to.have.property('amount');
         expect(res.body.amount).to.be.a('number');
+        
         expect(res.body.amount).to.equal(vetHelper.payload.length);
 
         const vets = await Vet.find({}).catch(error => console.error('Error!', error));
+        
         expect(vets.length).to.equal(res.body.amount);
+
+        expect(res.body).to.have.property('vets');
+        expect(res.body.vets).to.be.an('array');
+        expect(res.body.vets[0]).to.be.an('object');
+        expect(res.body.vets[0].name).to.not.be.undefined;
       });
     });
   })

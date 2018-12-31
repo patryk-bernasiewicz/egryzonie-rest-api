@@ -2,6 +2,7 @@ const FtpDeploy = require('ftp-deploy');
 const ftpDeploy = new FtpDeploy();
 const readline = require('readline');
 const nodeSSH = require('node-ssh');
+const fs = require('fs');
 
 let target;
 
@@ -33,6 +34,13 @@ if (!config[target]) {
 }
 
 const useConfig = config[target];
+
+
+// update package.json
+const pjson = require('./package.json');
+pjson.stage = target;
+fs.writeFileSync('./package.json', JSON.stringify(pjson, null, 2));
+
 
 const ftpDeployConfig = {
   user: useConfig.ftp.username,

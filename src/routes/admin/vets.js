@@ -86,9 +86,13 @@ router.post('/import', async (req, res, next) => {
     .filter(vet => !!vet.name && !!vet.address && !!vet.googleId)
     .map(vet => _.pick(vet, ['name', 'address', 'googleId', 'rodents', 'exoticAnimals', 'websiteUrl', 'phone']));
 
-  const insert = await Vet.collection.insert(vets).catch(next);
+  const insertedVets = await Promise.all(
+    vets.map(async vet => {
+      return await Vet.findOneAndUpdate({ googleId: vet.googleId }, vet, { new: true, upsert: true });
+    })
+  );
 
-  return res.status(201).json({ amount: insert.insertedCount });
+  return res.status(201).json({ amount: insertedVets.length, vets: insertedVets });
 });
 
 

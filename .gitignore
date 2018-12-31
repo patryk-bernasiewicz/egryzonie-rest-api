@@ -5,3 +5,7 @@ deploy/**
 !deploy/config.example.js
 **/*.log
 .nyc_output
+config/*.json
+^config/default.json
+^config/custom-environment-variables.json
+^config/test.json

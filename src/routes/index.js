@@ -11,7 +11,10 @@ const admin = require(path.resolve('src/routes/admin'));
 router.use(express.json());
 
 router.get('/', (req, res) => {
-  res.send('Hello!');
+  res.json({
+    message: 'Hello!',
+    environment: process.env.NODE_ENV || 'default'
+  });
 });
 
 router.use('/auth', auth);
