@@ -300,7 +300,11 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.body).to.have.property('vets');
         expect(res.body.vets).to.be.an('array');
         expect(res.body.vets[0]).to.be.an('object');
+        expect(res.body.vets[0]).to.have.property('name');
         expect(res.body.vets[0].name).to.not.be.undefined;
+        expect(res.body.vets[0]).to.have.property('slug');
+        expect(res.body.vets[0].slug).to.not.be.undefined;
+        expect(res.body.vets[0].slug).to.match(/^[a-z0-9\-]+$/);
       });
     });
   })

@@ -88,7 +88,13 @@ router.post('/import', async (req, res, next) => {
 
   const insertedVets = await Promise.all(
     vets.map(async vet => {
-      return await Vet.findOneAndUpdate({ googleId: vet.googleId }, vet, { new: true, upsert: true });
+      const exists = await Vet.findOne({ googleId: vet.googleId });
+      if (!exists) {
+        return await Vet.create(vet);
+      } else {
+        return await Vet.update({ googleId: vet.googleId }, vet, { new: true });
+      }
+      // return await Vet.findOneAndUpdate({ googleId: vet.googleId }, vet, { new: true, upsert: true });
     })
   );
 
