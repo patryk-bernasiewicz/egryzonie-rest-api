@@ -7,6 +7,14 @@ const Joi = require('joi');
 const nicknameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/;
 const emailRegex =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function validateEmail(email) {
+  return emailRegex.test(email);
+}
+
+function validateNickname(nickname) {
+  return nicknameRegex.test(nickname);
+}
+
 const userSchema = mongoose.Schema({
   nickname: {
     type: String,
@@ -14,7 +22,7 @@ const userSchema = mongoose.Schema({
     minlength: 5,
     maxlength: 50,
     validate: {
-      validator: value => nicknameRegex.test(value),
+      validator: validateNickname,
       message: 'invalid nickname'
     }
   },
@@ -24,9 +32,7 @@ const userSchema = mongoose.Schema({
     minlength: 5,
     maxlength: 255,
     validate: {
-      validator: value => {
-        return emailRegex.test(value);
-      },
+      validator: validateEmail,
       message: 'invalid email'
     }
   },
@@ -77,3 +83,5 @@ function validateUser(user) {
 exports.userSchema = userSchema;
 exports.User = mongoose.model('User', userSchema);
 exports.validateUser = validateUser;
+exports.validateEmail = validateEmail;
+exports.validateNickname = validateNickname;

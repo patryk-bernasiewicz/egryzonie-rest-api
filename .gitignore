@@ -6,6 +6,7 @@ deploy/**
 **/*.log
 .nyc_output
 config/*.json
-^config/default.json
-^config/custom-environment-variables.json
-^config/test.json
+!config/smtp.example.json
+!config/default.json
+!config/custom-environment-variables.json
+!config/test.json

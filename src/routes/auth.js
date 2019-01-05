@@ -1,9 +1,13 @@
 const path = require('path');
 const router = require('express').Router();
 const passport = require('passport');
-const { User, validateUser } = require(path.resolve('src/models/user'));
+const { User, validateUser, validateEmail } = require(path.resolve('src/models/user'));
 const { Agreement } = require(path.resolve('src/models/agreement'));
+const { PasswordRemind } = require(path.resolve('src/models/password-remind'));
 const _ = require('lodash');
+const Mailer = require(path.resolve('src/helpers/mailer'));
+
+
 
 // POST /auth/signup
 router.post('/signup', async (req, res) => {
@@ -72,12 +76,46 @@ router.post('/signin', async (req, res) => {
 
 // GET /auth/me
 router.get('/me', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  if (!req.user) {
-    return res.status(500).send('Something went terribly wrong!');
-  }
-
   return res.status(200).json(_.pick(req.user, ['email', 'role']));
 });
 
+
+
+// GET /auth/remind_password
+router.get('/remind_password', async (req, res, next) => {
+  const { email } = req.query;
+  
+  if (!email) {
+    return res.status(400).json({ message: 'email address is required' });
+  }
+
+  if (!validateEmail(email)) {
+    return res.status(400).json({ message: 'invalid email' });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(200).json();
+  }
+
+  const token = await PasswordRemind.generateToken();
+  const remind = await new PasswordRemind({ user, email, token })
+    .save()
+    .catch(next);
+
+  const mailOptions = {
+    from: 'kontakt@patrykb.pl',
+    to: email,
+    subject: 'e-Gryzonie - Reset Hasła',
+    text: `Aby zresetować hasło, wpisz token: ${token}\n`,
+    html: `<h1>e-Gryzonie - reset hasła</h1>
+      <p>Aby uzyskać nowe hasło, wpisz swój token: ${token}</p>`
+  };
+
+  const mailer = new Mailer();
+  await mailer.send(mailOptions);
+
+  return res.status(200).json();
+});
 
 module.exports = router;
