@@ -5,6 +5,7 @@ const logger = require('../helpers/logger');
 
 const express = require('express');
 const auth = require(path.resolve('src/routes/auth'));
+const remindPassword = require(path.resolve('src/routes/remind-password'));
 const vets = require(path.resolve('src/routes/vets'));
 
 const admin = require(path.resolve('src/routes/admin'));
@@ -21,6 +22,7 @@ router.get('/', (req, res) => {
 
 router.use('/auth', auth);
 router.use('/vets', vets);
+router.use('/remind-password', remindPassword);
 
 router.use('/admin', admin);
 

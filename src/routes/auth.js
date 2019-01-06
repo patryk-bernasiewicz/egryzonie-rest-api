@@ -1,13 +1,9 @@
 const path = require('path');
 const router = require('express').Router();
 const passport = require('passport');
-const { APP_ENV, NODE_ENV } = require(path.resolve('src/environment'));
-const { User, validateUser, validateEmail } = require(path.resolve('src/models/user'));
+const { User, validateUser } = require(path.resolve('src/models/user'));
 const { Agreement } = require(path.resolve('src/models/agreement'));
-const { PasswordRemind } = require(path.resolve('src/models/password-remind'));
 const _ = require('lodash');
-const Mailer = require(path.resolve('src/helpers/mailer'));
-
 
 
 // POST /auth/signup
@@ -80,39 +76,5 @@ router.get('/me', passport.authenticate('jwt', { session: false }), async (req, 
   return res.status(200).json(_.pick(req.user, ['email', 'role']));
 });
 
-
-
-// GET /auth/remind_password
-router.get('/remind_password', async (req, res, next) => {
-  const { email } = req.query;
-  
-  if (!email) {
-    return res.status(400).json({ message: 'email address is required' });
-  }
-
-  if (!validateEmail(email)) {
-    return res.status(400).json({ message: 'invalid email' });
-  }
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(200).json();
-  }
-
-  const token = await PasswordRemind.generateToken().catch(next);
-  await new PasswordRemind({ user, email, token })
-    .save()
-    .catch(next);
-
-  const data = {
-    address: APP_ENV === 'local',
-    token
-  };
-  const mailer = new Mailer();
-
-  await mailer.send(email, 'auth/password-remind', data).catch(next);
-
-  return res.status(200).json();
-});
 
 module.exports = router;
