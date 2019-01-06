@@ -1,16 +1,8 @@
-const MAIN_ENV = process.env.EG_ENV || 'public';  // local | remote | public
-
-if (MAIN_ENV !== 'local') {
-  const pjson = require('./package.json');
-  const stage = pjson.stage || 'development';
-  process.env.NODE_ENV = stage;
-}
-
-console.log(process.env.NODE_ENV);
-
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 const https = require('https');
+
+const { APP_ENV } = require(path.resolve('src/environment'));
 
 const app = require('./index');
 
@@ -28,7 +20,7 @@ const sslOptions = {
   cert: fs.readFileSync('cert/cert.pem')
 };
 
-if (MAIN_ENV === 'local') {
+if (APP_ENV === 'local') {
   // use https module to create local HTTPS server
   const port = process.env.PORT || 3000;
   https.createServer(sslOptions, app).listen(port, null, function() {

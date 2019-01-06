@@ -1,4 +1,5 @@
 const path = require('path');
+const { APP_ENV, NODE_ENV } = require(path.resolve('src/environment'));
 const router = require('express').Router();
 const logger = require('../helpers/logger');
 
@@ -13,7 +14,8 @@ router.use(express.json());
 router.get('/', (req, res) => {
   res.json({
     message: 'Hello!',
-    environment: process.env.NODE_ENV || 'default'
+    systemEnvironment: NODE_ENV,
+    appEnvironment: APP_ENV
   });
 });
 
@@ -26,7 +28,7 @@ router.use('/admin', admin);
 router.use(function(err, req, res, next) {
   logger.error(`${err.message}\n\n${err.stack}\n\n`);
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (NODE_ENV !== 'development') {
     delete err.stack;
   }
 

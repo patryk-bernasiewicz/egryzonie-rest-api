@@ -1,4 +1,5 @@
 const morgan = require('morgan');
+const { NODE_ENV } = require('../src/environment');
 const { transports, exceptions } = require('winston');
 const logger = require('../src/helpers/logger');
 
@@ -13,7 +14,7 @@ exports.init = function(app) {
   });
 
 
-  if (process.env.NODE_ENV === 'development') {
+  if (NODE_ENV === 'development') {
     app.use(morgan(
       '[:date] Requested :method :url from :remote-addr',
       { immediate: true }
