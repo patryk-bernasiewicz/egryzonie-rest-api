@@ -1,4 +1,6 @@
 {
+  "address": "https://localhost:3000",
+  "front": "https://localhost:4200",
   "jwtPrivateKey": "test",
   "db": "mongodb://localhost:27017/egryzonie-test-db",
   "allowedOrigins": ""

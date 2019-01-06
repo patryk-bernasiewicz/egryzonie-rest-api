@@ -124,9 +124,13 @@ describe('Auth integration tests', function() {
         // mock nodemailer transport because we don't want to send any emails
         nodemailer.createTransport = function() {
           return {
+            originalMessage: '',
             sendMail: function(options, callback) {
               sendMailCalls++;
-              callback(null, true);
+              if (callback) {
+                callback(null, true);
+              }
+              return { originalMessage: '' };
             },
             verify: function(callback) {
               callback(null, true);

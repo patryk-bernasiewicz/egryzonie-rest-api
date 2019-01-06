@@ -1,37 +1,35 @@
-const nodemailer = require('nodemailer');
-const config = require('config');
 const path = require('path');
+const nodemailer = require('nodemailer');
+const Email = require('email-templates');
+const { APP_ENV } = require(path.resolve('src/environment'));
+const config = require('config');
 
 class Mailer {
-  constructor() {
-    this._setUp();
-  }
-
-  send(options) {
-    if (!this.transporter) {
-      throw new Error('No transporter found!');
-    }
-
-    return this._send(options);
-  }
-
-  // promisify transporter's sendMail()
-  _send(options) {
-    return new Promise((resolve, reject) => {
-      this.transporter.sendMail(options, function(err, info) {
-        if (err) {
-          reject(err);
-        }
-
-        resolve(info);
-      });
-    });
-  }
-
-  _setUp() {
+  send(recipient, template, data = {}) {
     const smtpConfig = require(path.resolve('config/smtp.json'));
+    const transporter = nodemailer.createTransport(smtpConfig);
+    const email = new Email({
+      from: 'kontakt@e-gryzonie.pl',
+      send: true,
+      views: {
+        options: {
+          extension: 'mustache'
+        }
+      },
+      transport: transporter
+    });
 
-    this.transporter = nodemailer.createTransport(smtpConfig);
+    return email.send({
+      template: template,
+      message: {
+        to: recipient
+      },
+      locals: {
+        address: config.get('address'),
+        frontUrl: config.get('front'),
+        ...data
+      }
+    });
   }
 }
 
