@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
+const http = require('http');
 
 const { APP_ENV } = require(path.resolve('src/environment'));
 
@@ -15,18 +15,15 @@ if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
   process.kill(0);
 }
 
-const sslOptions = {
-  key: fs.readFileSync('cert/cert.key'),
-  cert: fs.readFileSync('cert/cert.pem')
-};
+// const sslOptions = {
+//   key: fs.readFileSync('cert/cert.key'),
+//   cert: fs.readFileSync('cert/cert.pem')
+// };
 
 if (APP_ENV === 'local') {
-  // use https module to create local HTTPS server
   const port = process.env.PORT || 3000;
-  https.createServer(sslOptions, app).listen(port, null, function() {
-    console.log(`Server listening on port ${port}...`);
-  });
+  app.listen(port, () => console.log(`Local HTTP server listening on port ${port}.`));
 } else {
   // for hosting with Passenger Phusion that automatically handles SSL configuration
-  app.listen(3000, () => console.log('Listening on port!'));
+  app.listen(3000, () => console.log('HTTP Server listening on defined port.'));
 }

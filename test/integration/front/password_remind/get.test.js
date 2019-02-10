@@ -36,8 +36,9 @@ describe('Remind Password integration tests', function() {
     mongoose.modelSchemas = {};
   });
 
+  // ------------------------------
 
-  describe('GET /remind_password', () => {
+  describe('GET /remind-password', () => {
     let email;
 
     beforeEach(async () => {
@@ -78,7 +79,8 @@ describe('Remind Password integration tests', function() {
 
     });
 
-    
+    // ------------------------------
+  
     describe('Valid payload', () => {
 
       it('should return 200 if email is valid', async () => {
@@ -120,7 +122,64 @@ describe('Remind Password integration tests', function() {
       });
 
     });
-
-
   });
+
+  // ------------------------------
+
+  describe('GET /remind-password/validate', () => {
+    let user;
+    let remind;
+    let token;
+
+    beforeEach(async () => {
+      user = await authHelper.createUser();
+      remind = await authHelper.createPasswordRemind(user);
+      token = remind.token;
+    });
+    
+    const exec = () => {
+      const params = `token=${token}`;
+      return request(server)
+        .get(`/remind-password/validate?${params}`)
+    };
+
+    
+    it('should generate user and remind', async () => {
+      expect(user).to.be.an('object');
+      expect(remind).to.be.an('object');
+      expect(token).to.be.a('string');
+      expect(token.length).to.equal(16);
+    });
+
+
+    it('should return 400 if token is not provided', async () => {
+      token = '';
+
+      const res = await exec();
+
+      expect(res.status).to.equal(400);
+      expect(res.body).to.have.property('message');
+      expect(res.body.message).to.match(/token must be specified/i);
+    });
+
+
+    it('should return 404 if token is not found', async () => {
+      token = 'JuStRaNdOmStRiNg';
+
+      const res = await exec();
+
+      expect(res.status).to.equal(404);
+      expect(res.body).to.have.property('message');
+      expect(res.body.message).to.match(/password remind request not found/i);
+    });
+
+
+    it('should return 200 if token is valid and found', async () => {
+      const res = await exec();
+
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.empty;
+    });
+  });
+
 });

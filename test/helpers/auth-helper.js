@@ -1,7 +1,7 @@
 const path = require('path');
 const { User } = require(path.resolve('src/models/user'));
 const { Agreement } = require(path.resolve('src/models/agreement'));
-const { PasswordRemind } = require(path.resolve('src/models/password-remind'));
+const { PasswordRemind, generate } = require(path.resolve('src/models/password-remind'));
 
 
 const adminPayload = {
@@ -42,6 +42,21 @@ class AuthHelper {
     const agreement = new Agreement({ agreement: 'signup', user: user }).save();
 
     return user;
+  }
+
+  async verifyPassword(userId, password) {
+    const user = await User.findOne({ _id: userId });
+    return await user.validatePassword(password);
+  }
+
+  async createPasswordRemind(user) {
+    const token = await PasswordRemind
+      .generateToken()
+      .catch(err => console.error('Generate token error!', err));
+    const remind = await new PasswordRemind({ user, token, email: user.email })
+      .save()
+      .catch(err => console.error('Save token error!', err));
+    return remind;
   }
 
   async retrievePasswordRemind(email) {

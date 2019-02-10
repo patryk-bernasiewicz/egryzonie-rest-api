@@ -1,20 +1,31 @@
+const path = require('path');
 const express = require('express');
 require('express-async-errors');
 const cors = require('cors');
 const config = require('config');
+const { APP_ENV } = require(path.resolve('src/environment'));
 
 const app = express();
 
-const origin = config.get('allowedOrigins').split(';') || ['http://localhost:4200', 'http://localhost:4000'];
 
-// this is a checking comment
+if (APP_ENV === 'public') {
+  const origin = config.get('allowedOrigins').split(';');
+  const corsOptions = {
+    origin,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['x-auth-token']
+  };
 
-app.use(cors({
-  origin,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['x-auth-token']
-}));
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
+} else {
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+}
 
 require('./startup/config')();
 require('./startup/passport')(app);

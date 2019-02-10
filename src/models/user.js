@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Joi = require('joi');
+const _ = require('lodash');
 
 const nicknameRegex = /^[a-zA-Z0-9ąćęłńóśżźĄĆĘŁŃÓŚŻŹ .,-:_]{1,}$/;
 const emailRegex =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -69,6 +70,16 @@ userSchema._middleware = {
 };
 
 userSchema.pre('save', userSchema._middleware.hashPassword);
+
+userSchema.pre('findOneAndUpdate', async function() {
+  const update = this.getUpdate();
+  if (!_.isEmpty(update.password)) {
+    const salt = await bcrypt.genSalt(6);
+    const hash = await bcrypt.hash(update.password, salt);
+    this.getUpdate().password = hash;
+  }
+  // userSchema._middleware.hashPassword;
+});
 
 function validateUser(user) {
   const schema = {
