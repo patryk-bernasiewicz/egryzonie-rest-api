@@ -6,13 +6,17 @@ const { APP_ENV } = require(path.resolve('src/environment'));
 
 const app = require('./index');
 
-// SSL
-const keyPath = path.resolve('cert', 'cert.key');
-const certPath = path.resolve('cert', 'cert.pem');
+const config = require('config');
 
-if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
-  console.error('No SSL certificates found!');
-  process.kill(0);
+// SSL
+if (config.get('use_SSL')) {
+  const keyPath = path.resolve('cert', 'cert.key');
+  const certPath = path.resolve('cert', 'cert.pem');
+
+  if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
+    console.error('No SSL certificates found!');
+    process.kill(0);
+  }
 }
 
 // const sslOptions = {

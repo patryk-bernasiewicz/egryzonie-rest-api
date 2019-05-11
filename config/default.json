@@ -3,5 +3,6 @@
   "front": "http://localhost:4200",
   "jwtPrivateKey": "",
   "db": "mongodb://localhost:27017/egryzonie-rest",
-  "allowedOrigins": "localhost:4000;localhost:4200"
+  "allowedOrigins": "localhost:4000;localhost:4200",
+  "use_SSL": false
 }
