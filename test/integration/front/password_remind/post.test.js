@@ -1,22 +1,19 @@
 const path = require('path');
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { describe, it, beforeEach } = require('mocha');
+const { before, after, describe, it, beforeEach } = require('mocha');
 const { expect } = require('chai');
-const nodemailer = require('nodemailer');
 
 const TestHelper = require(path.resolve('test/helpers/test-helper'));
 const AuthHelper = require(path.resolve('test/helpers/auth-helper'));
 
-const testHelper = new TestHelper;
-const authHelper = new AuthHelper;
+const testHelper = new TestHelper();
+const authHelper = new AuthHelper();
 
 let server;
 
-
 describe('Remind Password integration tests', function() {
   this.timeout(15000);
-
 
   before(async () => {
     testHelper.startDb();
@@ -24,17 +21,14 @@ describe('Remind Password integration tests', function() {
     server = testHelper.server;
   });
 
-
   beforeEach(async () => {
     await authHelper.clear();
-  })
-
+  });
 
   after(async () => {
     mongoose.models = {};
     mongoose.modelSchemas = {};
   });
-
 
   describe('POST /remind-password/change', () => {
     let user;
@@ -50,7 +44,7 @@ describe('Remind Password integration tests', function() {
         password: 'Abcd1234'
       };
     });
-    
+
     const exec = () => {
       return request(server)
         .post(`/remind-password/change?token=${token}`)
@@ -59,7 +53,7 @@ describe('Remind Password integration tests', function() {
 
     it('should return 400 if token is not present', async () => {
       token = '';
-      
+
       const res = await exec();
 
       expect(res.status).to.equal(400);
@@ -94,9 +88,11 @@ describe('Remind Password integration tests', function() {
       expect(res.body).to.not.have.property('message');
 
       // verify password was changed
-      const verifyPassword = await authHelper.verifyPassword(remind.user._id, payload.password);
+      const verifyPassword = await authHelper.verifyPassword(
+        remind.user._id,
+        payload.password
+      );
       expect(verifyPassword).to.equal(true);
     });
-
   });
 });

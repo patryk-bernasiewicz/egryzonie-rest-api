@@ -1,16 +1,16 @@
 const path = require('path');
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { describe, it, beforeEach, afterEach } = require('mocha');
+const { before, after, describe, it, beforeEach } = require('mocha');
 const { expect } = require('chai');
 
 const TestHelper = require(path.resolve('test/helpers/test-helper'));
 const VetHelper = require(path.resolve('test/helpers/vet-helper'));
 const AuthHelper = require(path.resolve('test/helpers/auth-helper'));
 
-const testHelper = new TestHelper;
-const vetHelper = new VetHelper;
-const authHelper = new AuthHelper;
+const testHelper = new TestHelper();
+const vetHelper = new VetHelper();
+const authHelper = new AuthHelper();
 
 mongoose.models = {};
 mongoose.modelSchemas = {};
@@ -25,7 +25,6 @@ describe('ADMIN Vets PUT routes', function() {
 
   let token;
   let admin;
-  let regularUser;
 
   before(async () => {
     testHelper.startDb();
@@ -33,35 +32,31 @@ describe('ADMIN Vets PUT routes', function() {
     server = testHelper.server;
 
     admin = await authHelper.createAdmin();
-    regularUser = await authHelper.createUser();
+    await vetHelper.populate();
   });
 
-
-  after(() => {
+  after(async () => {
     // Clear mongoose models so that mocha's --watch works
     mongoose.models = {};
     mongoose.modelSchemas = {};
-    vetHelper.clear();
+    await vetHelper.clear();
     testHelper.closeServer();
   });
 
-
-  beforeEach(() => {
-    vetHelper.populate();
+  beforeEach(async () => {
     token = admin.generateAuthToken();
   });
 
-
   // PUT /vets
   describe('PUT /vets', async () => {
-    
     let payload;
     let savedVet;
     before(async () => {
       savedVet = new Vet({
         googleId: 'aaa',
         name: 'A Newly Added Vet',
-        address: '4914 St Random Street, V5T 1Z7 Vancouver, British Columbia, Canada'
+        address:
+          '4914 St Random Street, V5T 1Z7 Vancouver, British Columbia, Canada'
       });
       await savedVet.save();
     });
@@ -84,7 +79,7 @@ describe('ADMIN Vets PUT routes', function() {
         .put(route)
         .send(payload)
         .set('Authorization', `Bearer ${token}`);
-    }
+    };
 
     it('should return 401 if user is not an admin', async () => {
       const regularUser = await new User({
@@ -128,7 +123,7 @@ describe('ADMIN Vets PUT routes', function() {
       expect(res.status).to.equal(400);
       expect(res.body.message).to.match(/invalid name/i);
     });
-    
+
     it('should return 400 if name is missing', async () => {
       payload.name = '';
 
@@ -208,12 +203,12 @@ describe('ADMIN Vets PUT routes', function() {
     });
 
     it('gets the Vet updated and returns it', async () => {
-      expect(2+2).to.equal(4);
-      
+      expect(2 + 2).to.equal(4);
+
       const res = await exec();
 
       expect(res.status).to.equal(200);
-      
+
       expect(res.body).to.have.property('vet');
       expect(res.body.vet).to.be.an('object');
       expect(res.body.vet).to.have.property('name');
@@ -223,6 +218,5 @@ describe('ADMIN Vets PUT routes', function() {
       expect(res.body).to.have.property('location');
       expect(res.body.location).to.be.a('string');
     });
-    
   });
 });

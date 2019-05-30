@@ -9,15 +9,19 @@ const app = express();
 
 let corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'Authorization'
+  ],
   exposedHeaders: ['x-auth-token']
 };
 
 if (APP_ENV === 'public') {
   corsOptions.origin = config.get('allowedOrigins').split(';') || '*';
 }
-
-console.log('CORS: ', corsOptions);
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));

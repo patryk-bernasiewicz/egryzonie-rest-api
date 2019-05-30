@@ -1,22 +1,21 @@
 const path = require('path');
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { describe, it, beforeEach, afterEach } = require('mocha');
+const { before, after, describe, it, beforeEach, afterEach } = require('mocha');
 const { expect } = require('chai');
 
 const TestHelper = require(path.resolve('test/helpers/test-helper'));
 const VetHelper = require(path.resolve('test/helpers/vet-helper'));
 const AuthHelper = require(path.resolve('test/helpers/auth-helper'));
 
-const testHelper = new TestHelper;
-const vetHelper = new VetHelper;
-const authHelper = new AuthHelper;
+const testHelper = new TestHelper();
+const vetHelper = new VetHelper();
+const authHelper = new AuthHelper();
 
 mongoose.models = {};
 mongoose.modelSchemas = {};
 
 const { Vet } = require(path.resolve('src/models/vet'));
-const { User } = require(path.resolve('src/models/user'));
 
 let server;
 
@@ -36,19 +35,21 @@ describe('ADMIN Vets POST routes', function() {
     regularUser = await authHelper.createUser();
   });
 
+  after(async () => {
+    await vetHelper.clear();
+  });
 
-  beforeEach(() => {
-    // vetHelper.populate();
+  beforeEach(async () => {
+    await vetHelper.clear();
+    await vetHelper.populate();
     token = admin.generateAuthToken();
   });
 
   afterEach(() => {
-    vetHelper.clear();
     // Clear mongoose models so that mocha's --watch works
     mongoose.models = {};
     mongoose.modelSchemas = {};
   });
-
 
   // POST /vets
   describe('POST /vets', async () => {
@@ -57,7 +58,8 @@ describe('ADMIN Vets POST routes', function() {
       payload = {
         googleId: 'a',
         name: 'A Newly Added Vet',
-        address: '4914 St Random Street, V5T 1Z7 Vancouver, British Columbia, Canada',
+        address:
+          '4914 St Random Street, V5T 1Z7 Vancouver, British Columbia, Canada',
         rodents: true,
         exoticAnimals: true,
         websiteUrl: 'http://some-random-website-address.org/',
@@ -70,21 +72,20 @@ describe('ADMIN Vets POST routes', function() {
         .post('/admin/vets')
         .send(payload)
         .set('Authorization', `Bearer ${token}`);
-    }
+    };
 
     describe('Authentication', () => {
       it('should return 401 if user is not an admin', async () => {
         token = regularUser.generateAuthToken();
-  
+
         const res = await exec();
-  
+
         expect(res.status).to.equal(401);
         expect(res.body.message).to.match(/unauthorized/i);
       });
     });
 
     describe('Invalid payload', () => {
-
       // Name
       it('should return 400 if Google Maps ID is missing', async () => {
         delete payload.googleId;
@@ -94,7 +95,7 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.status).to.equal(400);
         expect(res.body.message).to.match(/invalid google id/i);
       });
-      
+
       it('should return 400 if name is missing', async () => {
         payload.name = '';
 
@@ -113,7 +114,7 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.status).to.equal(400);
         expect(res.body.message).to.match(/invalid name/i);
       });
-      
+
       it('should return 400 if name is missing', async () => {
         payload.name = '';
 
@@ -201,9 +202,14 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.body).to.have.property('vet');
         expect(res.body.vet).to.be.an('object');
         expect(res.body).to.have.property('location');
-        expect(res.body.location).to.match(new RegExp('\/admin\/vets\/a-newly-added-vet', 'i'));
+        expect(res.body.location).to.match(
+          new RegExp('/admin/vets/a-newly-added-vet', 'i')
+        );
 
-        const foundVet = await Vet.findOne({ name: payload.name }).populate('acceptedBy', '_id nickname');
+        const foundVet = await Vet.findOne({ name: payload.name }).populate(
+          'acceptedBy',
+          '_id nickname'
+        );
         expect(foundVet).to.not.be.null;
         expect(foundVet).to.have.property('name');
         expect(foundVet.name).to.equal(payload.name);
@@ -222,17 +228,16 @@ describe('ADMIN Vets POST routes', function() {
         expect(foundVet.acceptedBy).to.be.an('object');
       });
     });
-
   });
 
-
   // POST /vets/import
-  describe('POST /vets/import', async () => {
+  describe('POST /vets/import', async function() {
+    this.timeout(15000);
 
     let payload;
-    
+
     beforeEach(() => {
-      payload = [ ...vetHelper.payload ];
+      payload = [...vetHelper.payload];
     });
 
     const exec = () => {
@@ -240,14 +245,14 @@ describe('ADMIN Vets POST routes', function() {
         .post('/admin/vets/import')
         .send(payload)
         .set('Authorization', `Bearer ${token}`);
-    }
+    };
 
     describe('Authentication', () => {
       it('should return 401 if user is not an admin', async () => {
         token = regularUser.generateAuthToken();
-  
+
         const res = await exec().catch(error => console.error('Error!', error));
-  
+
         expect(res.status).to.equal(401);
         expect(res.body.message).to.match(/unauthorized/i);
       });
@@ -258,7 +263,7 @@ describe('ADMIN Vets POST routes', function() {
         payload = { foo: 'bar' };
 
         const res = await exec();
-        
+
         expect(res.status).to.equal(400);
         expect(res.body.message).to.match(/import expects an array of Vets/);
       });
@@ -290,11 +295,13 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.status).to.equal(201);
         expect(res.body).to.have.property('amount');
         expect(res.body.amount).to.be.a('number');
-        
+
         expect(res.body.amount).to.equal(vetHelper.payload.length);
 
-        const vets = await Vet.find({}).catch(error => console.error('Error!', error));
-        
+        const vets = await Vet.find({}).catch(error =>
+          console.error('Error!', error)
+        );
+
         expect(vets.length).to.equal(res.body.amount);
 
         expect(res.body).to.have.property('vets');
@@ -307,5 +314,5 @@ describe('ADMIN Vets POST routes', function() {
         expect(res.body.vets[0].slug).to.match(/^[a-z0-9\-]+$/);
       });
     });
-  })
+  });
 });

@@ -12,7 +12,12 @@ class VetHelper {
       { name: 'Mno', address: '567 St.', googleId: 'mno', accepted: true },
       { name: 'Pqr', address: '678 St.', googleId: 'pqr', accepted: true },
       { name: 'Stu', address: '890 St.', googleId: 'stu', accepted: true },
-      { name: 'Zzz Caffee', address: 'Zzz St.', googleId: 'zzz', accepted: true }
+      {
+        name: 'Zzz Caffee',
+        address: 'Zzz St.',
+        googleId: 'zzz',
+        accepted: true
+      }
     ];
     this.vets = [];
   }
@@ -21,18 +26,15 @@ class VetHelper {
     await this._saveVets();
     return await Vet.find({});
   }
-  
+
   async createOne() {
-    await Vet
-      .create(this.vets[0])
-      .catch(err => console.error(err.message));
+    await Vet.create(this.vets[0]).catch(err => console.error(err.message));
   }
 
   async clear() {
-    await Vet
-      .deleteMany({})
-      .catch(err => console.error(err.message));
-    await mongoose.connection.db.collection('_slug_ctrs')
+    await Vet.deleteMany({}).catch(err => console.error(err.message));
+    await mongoose.connection.db
+      .collection('_slug_ctrs')
       .deleteMany({})
       .catch(err => console.error(err.message));
   }

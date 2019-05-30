@@ -1,16 +1,16 @@
 const path = require('path');
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { describe, it, beforeEach, afterEach } = require('mocha');
+const { before, after, describe, it, beforeEach, afterEach } = require('mocha');
 const { expect } = require('chai');
 
 const TestHelper = require(path.resolve('test/helpers/test-helper'));
 const VetHelper = require(path.resolve('test/helpers/vet-helper'));
 const AuthHelper = require(path.resolve('test/helpers/auth-helper'));
 
-const testHelper = new TestHelper;
-const vetHelper = new VetHelper;
-const authHelper = new AuthHelper;
+const testHelper = new TestHelper();
+const vetHelper = new VetHelper();
+const authHelper = new AuthHelper();
 
 mongoose.models = {};
 mongoose.modelSchemas = {};
@@ -35,30 +35,27 @@ describe('ADMIN Vets GET routes', function() {
 
     await vetHelper.clear();
 
-    vets = await vetHelper.populate();
     admin = await authHelper.createAdmin();
     regularUser = await authHelper.createUser();
   });
 
-
   after(async () => {
+    await vetHelper.clear();
+
     // Clear mongoose models so that mocha's --watch works
     mongoose.models = {};
     mongoose.modelSchemas = {};
     testHelper.closeServer();
-    
-    await vetHelper.clear();
   });
 
-
   beforeEach(async () => {
+    await vetHelper.clear();
+    vets = await vetHelper.populate();
     token = admin.generateAuthToken();
   });
 
-
   // GET /admin/vets
   describe('GET /vets', async () => {
-
     const exec = () => {
       return request(server)
         .get('/admin/vets')
@@ -92,10 +89,8 @@ describe('ADMIN Vets GET routes', function() {
     });
   });
 
-
   describe('GET /vets with pagination', async () => {
-
-    const exec = (page) => {
+    const exec = page => {
       const perPage = 1;
       return request(server)
         .get(`/admin/vets?page=${page}&limit=${perPage}`)
@@ -112,20 +107,19 @@ describe('ADMIN Vets GET routes', function() {
     });
 
     it('should return 200 and return list of vets', async () => {
-      const all = await Promise.all([ exec(1), exec(2) ]);
+      const all = await Promise.all([exec(1), exec(2)]);
 
       for (let res of all) {
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property('total');
         expect(res.body.total).to.be.a('number');
         expect(res.body.total).to.equal(vets.length);
-      };
+      }
 
       expect(all[0].body.vets[0].name).to.equal(vets[0].name);
       expect(all[1].body.vets[0].name).to.equal(vets[1].name);
     });
   });
-
 
   // GET /admin/vets/:slug
   describe('GET /vets/:slug', async () => {
@@ -186,10 +180,8 @@ describe('ADMIN Vets GET routes', function() {
     });
   });
 
-
   // GET /admin/vets/export
   describe('GET /admin/vets/export', () => {
-
     const exec = () => {
       return request(server)
         .get('/admin/vets/export')
@@ -213,10 +205,9 @@ describe('ADMIN Vets GET routes', function() {
     it('should return 200 and CSV type response', async () => {
       const res = await exec();
 
-      expect(res.type).to.equal('text');
+      expect(res.type).to.equal('text/csv');
       expect(res.message).to.be.undefined;
       expect(res.status).to.equal(200);
     });
-
   });
 });
